@@ -1,0 +1,1899 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="Chapter 6 中断管理, Koito Yuu&#39;s Blogs">
+    <meta name="description" content="中断管理章节介绍和范围事件嵌入式实时系统必须对源自环境的事件做出响应。例如，到达以太网外设的数据包（事件）可能需要传递到 TCP/IP 栈进行处理（操作）。非平凡的系统必须服务于来自多个源的事件，所有这些源都有不同的处理开销和响应时间要求。">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Chapter 6 中断管理 | Koito Yuu&#39;s Blogs</title>
+    <link rel="icon" type="image/png" href="/Blogs/favicon.png">
+    
+    <style>
+        body{
+            background-image: url(https://cdn.jsdelivr.net/gh/Tokisaki-Galaxy/res/site/medias/background.jpg);
+            background-repeat:no-repeat;
+            background-size: 100% 100%;
+            background-attachment:fixed;
+        }
+    </style>
+
+
+
+    <!-- bg-cover style     -->
+
+
+
+<link rel="stylesheet" type="text/css" href="/Blogs/libs/awesome/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="/Blogs/libs/materialize/materialize.min.css">
+<link rel="stylesheet" type="text/css" href="/Blogs/libs/aos/aos.css">
+<link rel="stylesheet" type="text/css" href="/Blogs/libs/animate/animate.min.css">
+<link rel="stylesheet" type="text/css" href="/Blogs/libs/lightGallery/css/lightgallery.min.css">
+<link rel="stylesheet" type="text/css" href="/Blogs/css/matery.css">
+<link rel="stylesheet" type="text/css" href="/Blogs/css/my.css">
+<link rel="stylesheet" type="text/css" href="/Blogs/css/dark.css" media="none" onload="if(media!='all')media='all'">
+
+
+
+
+    <link rel="stylesheet" href="/Blogs/libs/tocbot/tocbot.css">
+    <link rel="stylesheet" href="/Blogs/css/post.css">
+
+
+
+
+    
+        <link rel="stylesheet" type="text/css" href="/Blogs/css/reward.css">
+    
+
+
+
+    <script src="/Blogs/libs/jquery/jquery-3.6.0.min.js"></script>
+
+<meta name="generator" content="Hexo 7.1.1">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="stylesheet" href="/Blogs/css/prism.css" type="text/css"></head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/Blogs/" class="waves-effect waves-light">
+                    
+                    <img src="/Blogs/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Koito Yuu&#39;s Blogs</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/Blogs/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/Blogs/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/Blogs/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/Blogs/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/Blogs/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/Blogs/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/Blogs/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+  <li>
+    <a href="javascript:;" class="waves-effect waves-light" onclick="switchNightMode()" title="深色/浅色模式" >
+      <i id="sum-moon-icon" class="fas fa-sun" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/Blogs/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Koito Yuu&#39;s Blogs</div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/Blogs/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/Blogs/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/Blogs/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/Blogs/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/Blogs/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/Blogs/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/Blogs/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/Koito-Yuu153/Koito-Yuu-s-Blog.github.io" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/Koito-Yuu153/Koito-Yuu-s-Blog.github.io" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/Blogs/medias/featureimages/22.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Chapter 6 中断管理</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                          <div class="article-tag">
+                            <span class="chip bg-color">无标签</span>
+                          </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/Blogs/categories/FreeRTOS/" class="post-category">
+                                FreeRTOS
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2024-03-21
+                </div>
+                
+
+                
+
+                
+
+                
+
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h1 id="中断管理"><a href="#中断管理" class="headerlink" title="中断管理"></a>中断管理</h1><h2 id="章节介绍和范围"><a href="#章节介绍和范围" class="headerlink" title="章节介绍和范围"></a>章节介绍和范围</h2><h3 id="事件"><a href="#事件" class="headerlink" title="事件"></a>事件</h3><p>嵌入式实时系统必须对源自环境的事件做出响应。例如，到达以太网外设的数据包（事件）可能需要传递到 TCP/IP 栈进行处理（操作）。非平凡的系统必须服务于来自多个源的事件，所有这些源都有不同的处理开销和响应时间要求。在每种情况下，都必须对最佳事件处理实施策略作出判断：</p>
+<ol>
+<li>如何检测事件？通常使用中断，但也可以轮询输入。</li>
+<li>当使用中断时，应在中断服务例程 (ISR) 内部执行多少处理，在外部执行多少处理？通常希望每个 ISR 尽可能短。</li>
+<li>如何将事件与主 (非 ISR) 代码通信，以及如何构造此代码以最佳地适应潜在异步事件的处理？</li>
+</ol>
+<p>FreeRTOS 不会对应用程序设计者强加任何特定的事件处理策略，但确实提供了允许以简单且可维护的方式实现所选策略的功能。</p>
+<p>重要的是区分任务的优先级和中断的优先级：</p>
+<ul>
+<li>任务是与运行 FreeRTOS 的硬件无关的软件功能。 任务的优先级由应用程序编写者在软件中分配，软件算法 (调度器) 决定哪个任务将处于运行状态。</li>
+<li>虽然中断服务例程是用软件编写的，但它是一个硬件特性，因为硬件控制哪个中断服务例程将运行，以及何时运行。任务只会在没有 ISR 运行时运行，因此最低优先级的中断将中断最高优先级的任务，并且任务无法抢占 ISR 。</li>
+</ul>
+<p>所有运行 FreeRTOS 的体系结构都能够处理中断，但是与中断进入和中断优先级分配有关的架构之间有所不同。</p>
+<h3 id="范围"><a href="#范围" class="headerlink" title="范围"></a>范围</h3><p>本章旨在让读者更好地理解：</p>
+<ul>
+<li>哪些 FreeRTOS API 函数可以在中断服务程序中使用。</li>
+<li>将中断处理延迟到任务的方法。</li>
+<li>如何创建和使用二进制信号量和计数信号量。</li>
+<li>二进制和计数信号量之间的区别。</li>
+<li>如何使用队列将数据传入和传出中断服务程序。</li>
+<li>中断嵌套模型可用于一些 FreeRTOS 移植。</li>
+</ul>
+<h2 id="从-ISR-使用-FreeRTOS-API"><a href="#从-ISR-使用-FreeRTOS-API" class="headerlink" title="从 ISR 使用 FreeRTOS API"></a>从 ISR 使用 FreeRTOS API</h2><h3 id="中断安全-API"><a href="#中断安全-API" class="headerlink" title="中断安全 API"></a>中断安全 API</h3><p>通常需要从中断服务例程 (ISR) 中使用 FreeRTOS API 函数提供的功能，但是许多FreeRTOS API 函数执行的操作在 ISR 中无效——其中最值得注意的是将调用 API 函数的任务置于阻塞状态； 如果从 ISR 调用 API 函数，则它不是从任务调用的，所以没有调用任务可以被置于阻塞状态。 FreeRTOS 通过提供一些 API 函数的两个版本来解决这个问题；一个版本用于任务，另一个版本用于 ISR。打算从 ISR 中使用的函数在其名称后附加了  “<code>FromISR</code>” 。	</p>
+<blockquote>
+<p>注意：切勿从 ISR 调用名称中不含 “<code>FromISR</code>” 的 FreeRTOS API 函数。</p>
+</blockquote>
+<h3 id="使用单独的中断安全-API-的好处"><a href="#使用单独的中断安全-API-的好处" class="headerlink" title="使用单独的中断安全 API 的好处"></a>使用单独的中断安全 API 的好处</h3><p>具有用于中断的单独 API 可以使任务代码更高效，ISR 代码更有效，并且进入中断更简单。 要了解原因，请考虑另一种解决方案，该解决方案将提供可以从任务和 ISR 调用的每个 API 函数的单个版本。如果可以从任务和 ISR 调用相同版本的 API 函数，则：</p>
+<ul>
+<li>API 函数将需要额外的逻辑来确定它们是从任务还是 ISR 调用的。额外的逻辑将引入通过函数的新路径，使函数更长，更复杂，更难测试。</li>
+<li>当从任务调用函数时，某些 API 函数参数将过时，而当从 ISR 调用函数时，其他 API 函数参数将过时。</li>
+<li>每个 FreeRTOS 移植都需要提供一个用于确定执行上下文 (任务或ISR) 的机制。</li>
+<li>难以确定执行上下文（任务或 ISR）的架构将需要额外的、浪费的、使用起来更复杂的非标准中断进入代码，允许软件提供执行上下文。</li>
+</ul>
+<h3 id="使用单独的中断安全-API-的缺点"><a href="#使用单独的中断安全-API-的缺点" class="headerlink" title="使用单独的中断安全 API 的缺点"></a>使用单独的中断安全 API 的缺点</h3><p>拥有两个版本的一些 API 函数可以提高任务和 ISR 的效率，但会带来新的问题；有时需要从任务和 ISR 调用不属于 FreeRTOS API 的函数，但使用 FreeRTOS API。</p>
+<p>这通常只是集成第三方代码时的问题，因为这是软件设计不受应用程序编写者控制的唯一时候。 如果这确实成为一个问题，那么可以使用以下技术之一来克服该问题：</p>
+<ol>
+<li><p>将中断处理延迟到任务，因此只从任务的上下文中调用 API 函数。</p>
+<blockquote>
+<p>本书的下一节将介绍延迟中断处理。</p>
+</blockquote>
+</li>
+<li><p>如果您使用的是支持中断嵌套的 FreeRTOS 移植，则使用以 “<code>FromISR</code>” 结尾的 API 函数版本，因为该版本可以从任务和 ISR 中调用（反之则不然，不以 “<code>FromISR</code>” 结尾的 API 函数不能从 ISR 调用）。</p>
+</li>
+<li><p>第三方代码通常包括一个 RTOS 抽象层，可以实现该抽象层来测试调用函数的上下文 (任务或中断) ，然后调用适合该上下文的 API 函数。</p>
+</li>
+</ol>
+<h3 id="xHigherPriorityTaskWoken-参数"><a href="#xHigherPriorityTaskWoken-参数" class="headerlink" title="xHigherPriorityTaskWoken 参数"></a>xHigherPriorityTaskWoken 参数</h3><p>本节介绍了 <code>xHigherPriorityTaskWoken</code> 参数的概念。 如果您还没有完全理解本节，请不要担心，因为后续章节提供了实际示例。</p>
+<p>如果上下文切换是由中断执行的，那么中断退出时运行的任务可能与进入中断时运行的任务不同——中断将中断一个任务，但返回到另一个任务。</p>
+<p>一些 FreeRTOS API 函数可以将任务从阻塞状态移动到就绪状态。 这已经在诸如 <code>xQueueSendToBack()</code> 之类的函数中看到了，如果有一个任务在阻塞状态等待数据在主题队列上可用，它将解除对任务的阻塞。</p>
+<p>如果被 FreeRTOS API 函数解除阻塞的任务的优先级高于处于运行状态下的任务的优先级，那么根据 FreeRTOS 调度策略，应该切换到更高优先级的任务。 实际切换到更高优先级任务的时间取决于调用 API 函数的上下文：</p>
+<ul>
+<li><p>如果从任务中调用 API 函数</p>
+<p>如果在 <code>FreeRTOSConfig.h</code> 中将 <code>configUSE_PREEMPTION</code> 设置为 1，那么在 API 函数中会自动切换到更高优先级的任务——所以在 API 函数退出之前。 这已经在图 43 中看到，其中写入定时器命令队列导致在写入命令队列的函数退出之前切换到 RTOS 守护任务。</p>
+</li>
+<li><p>如果从中断调用 API 函数</p>
+<p>中断内不会自动切换到更高优先级的任务。 相反，设置了一个变量来通知应用程序编写者应该执行上下文切换。 中断安全 API 函数（以 “<code>FromISR</code>” 结尾的函数）有一个名为 <code>pxHigherPriorityTaskWoken</code> 的指针参数，用于此目的。</p>
+<p>如果应该执行上下文切换，则中断安全 API 函数会将 <code>*pxHigherPriorityTaskWoken</code> 设置为 <code>pdTRUE</code>。 为了能够检测到这种情况，<code>pxHigherPriorityTaskWoken</code> 指向的变量在第一次使用之前必须初始化为 <code>pdFALSE</code>。</p>
+<p>如果应用程序编写者选择不从 ISR 请求上下文切换，则更高优先级的任务将保持就绪状态，直到调度程序下次运行——在最坏的情况下将在下一次滴答中断期间。</p>
+<p>FreeRTOS API 函数只能将 <code>*pxHighPriorityTaskWoken</code> 设置为 <code>pdTRUE</code>。 如果一个 ISR 调用了多个 FreeRTOS API 函数，那么可以在每个 API 函数调用将同一个的变量作为 <code>pxHigherPriorityTaskWoken</code> 参数传递，并且只需要在第一次使用该变量之前初始化为 <code>pdFALSE</code>。</p>
+</li>
+</ul>
+<p>上下文切换不会在 API 函数的中断安全版本中自动发生的原因有几个:</p>
+<ol>
+<li><p>避免不必要的上下文切换</p>
+<p>在任务需要执行任何处理之前，中断可能会执行多次。 例如，考虑一个任务处理一个由中断驱动的 <code>UART</code> 接收到的字符串的场景； 每次接收到一个字符时，<code>UART ISR</code> 都切换到任务是一种浪费，因为任务只有在接收到完整字符串后才能执行。</p>
+</li>
+<li><p>控制执行顺序</p>
+<p>中断可能偶尔发生，而且发生的时间不可预测。 专业的 FreeRTOS 用户可能希望暂时避免在其应用程序中的特定点不可预测地切换到不同的任务——尽管这也可以使用 FreeRTOS 调度程序锁定机制来实现。</p>
+</li>
+<li><p>可移植性</p>
+<p>这是可以在所有FreeRTOS移植上使用的最简单的机制。</p>
+</li>
+<li><p>效率</p>
+<p>面向较小处理器架构的移植仅允许在 ISR 的最后请求上下文切换，而消除该限制将需要额外且更复杂的代码。 它还允许在同一 ISR 内多次调用 FreeRTOS API 函数，而不会在同一 ISR 内生成多个上下文切换请求。</p>
+</li>
+<li><p>在 RTOS 滴答定时中断执行</p>
+<p>正如本书后面将看到的，可以将应用程序代码添加到 RTOS 滴答中断中。 尝试在滴答中断内进行上下文切换的结果取决于正在使用的 FreeRTOS 移植。在最好的情况下，它只会导致不必要的调度程序调用。</p>
+</li>
+</ol>
+<p> <code>pxHigherPriorityTaskWoken</code> 参数的使用是可选的。 如果不需要，则将 <code>pxHigherPriorityTaskWoken</code> 设置为 <code>NULL</code>。</p>
+<h3 id="portYIELD-FROM-ISR-和-portEND-SWITCHING-ISR-宏"><a href="#portYIELD-FROM-ISR-和-portEND-SWITCHING-ISR-宏" class="headerlink" title="portYIELD_FROM_ISR() 和 portEND_SWITCHING_ISR() 宏"></a>portYIELD_FROM_ISR() 和 portEND_SWITCHING_ISR() 宏</h3><p>本节介绍用于从 ISR 请求上下文切换的宏。 如果您尚未完全理解本节，请不要担心，因为后续章节提供了实际示例。</p>
+<p><code>taskYIELD()</code> 是一个宏，可以在任务中调用以请求上下文切换。 <code>portYIELD_FROM_ISR()</code> 和 <code>portEND_SWITCHING_ISR()</code> 都是 <code>taskYIELD()</code> 的中断安全版本。 <code>portYIELD_FROM_ISR()</code> 和 <code>portEND_SWITCHING_ISR()</code> 都以同样的方式使用，并且做同样的事情[1]。 某些 FreeRTOS 移植仅提供两个宏之一。 较新的 FreeRTOS 移植提供这两种宏。本书中的示例使用 <code>portYIELD_FROM_ISR()</code>。</p>
+<blockquote>
+<p>[1] : 从历史上看，portEND_SWITCHING_ISR() 是要求中断处理程序使用汇编代码包装器的 FreeRTOS 移植中使用的名称，而 portYIELD_FROM_ISR() 是允许整个中断处理程序用 C 编写的 FreeRTOS 移植中使用的名称。</p>
+</blockquote>
+<pre class=" language-c"><code class="language-c"><span class="token function">portEND_SWITCHING_ISR</span><span class="token punctuation">(</span> xHigherPriorityTaskWoken <span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>清单 87. <code>portEND_SWITCHING_ISR()</code> 宏</p>
+<pre class=" language-c"><code class="language-c"><span class="token function">portYIELD_FROM_ISR</span><span class="token punctuation">(</span> xHigherPriorityTaskWoken <span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>清单 88. <code>portYIELD_FROM_ISR()</code> 宏</p>
+<p>从中断安全 API 函数传出的 <code>xHigherPriorityTaskWoken</code> 参数可以直接用作 <code>portYIELD_FROM_ISR()</code> 调用中的参数。</p>
+<p>如果 <code>portYIELD_FROM_ISR()</code> <code>xHigherPriorityTaskWoken</code> 参数是 <code>pdFALSE(0)</code>，则不请求上下文切换，并且宏不起作用。 如果 <code>portYIELD_FROM_ISR()</code> <code>xHigherPriorityTaskWoken</code> 参数不是 <code>pdFALSE</code>，则请求上下文切换，并且处于运行状态的任务可能会更改。 中断将始终返回到处于运行状态的任务，即使在中断执行期间处于运行状态的任务发生了变化。</p>
+<p>大多数 FreeRTOS 移植允许在 ISR 内的任何位置调用 <code>portYIELD_FROM_ISR()</code>。 一些 FreeRTOS 移植（主要用于较小的架构）仅允许在 ISR 的最后调用 <code>portYIELD_FROM_ISR()</code>。</p>
+<h2 id="延迟中断处理"><a href="#延迟中断处理" class="headerlink" title="延迟中断处理"></a>延迟中断处理</h2><p>通常认为最佳实践是使 ISR 尽可能短。 其原因包括：</p>
+<ul>
+<li>即使已经为任务分配了非常高的优先级，它们也仅在硬件没有服务中断时运行。</li>
+<li>ISR 可以中断（添加“抖动”）任务的开始时间和执行时间。</li>
+<li>根据运行 FreeRTOS 的架构，在执行 ISR 时可能无法接受任何新中断，或至少无法接受新中断的子集。</li>
+<li>应用程序编写者需要考虑并防范任务和 ISR 同时访问变量、外设和内存缓冲区等资源的后果。</li>
+<li>一些 FreeRTOS 移植允许中断嵌套，但中断嵌套会增加复杂性并降低可预测性。中断越短，嵌套的可能性就越小。</li>
+</ul>
+<p>中断服务程序必须记录中断的原因，并清除中断。 中断所需的任何其他处理通常可以在任务中执行，从而允许中断服务程序尽可能快地退出。这称为 <code>"延迟中断处理"</code>，因为中断所需的处理被从 ISR “延迟” 到任务。</p>
+<p>将中断处理延迟到任务还允许应用程序编写者相对于应用程序中的其他任务确定处理的优先级，并使用所有 FreeRTOS API 函数。</p>
+<p>如果中断处理延迟到的任务的优先级高于任何其他任务的优先级，则处理将立即执行，就像在 ISR 本身中执行处理一样。 这种情况如图 48 所示，其中任务 1 是一个正常的应用程序任务，任务 2 是中断处理被延迟到的任务。</p>
+<p><img src="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/image-20240401105637107.png" alt="图 48 在高优先级任务中完成中断处理"></p>
+<p>在图 48 中，中断处理从 t2 时刻开始，实际上在 t4 时刻有效地结束，但只有 t2 和 t3 时刻之间的时间段用于 ISR。 如果未使用延迟中断处理，则时间 t2 和 t4 之间的整个时间段都将花费在 ISR 中。</p>
+<p>对于何时最好执行 ISR 中的中断所需的所有处理，以及何时最好将部分处理延迟到任务，没有绝对的规则。在以下情况下，将处理延迟到任务最有用 :</p>
+<ul>
+<li>中断所必需的处理不是微不足道的。 例如，如果中断只是存储模数转换的结果，那么几乎可以肯定这最好在 ISR 内部执行，但如果转换结果还必须通过软件过滤器，那么可能最好是在任务中执行过滤器。</li>
+<li>中断处理可以方便地执行无法在 ISR 内部执行的操作，例如写入控制台或分配内存。</li>
+<li>中断处理不是确定性的——这意味着事先不知道处理将要花费多长时间。</li>
+</ul>
+<p>以下各节描述并演示了本章到目前为止介绍的概念，包括可用于实现延迟中断处理的 FreeRTOS 功能。</p>
+<h2 id="用于同步的二进制信号量"><a href="#用于同步的二进制信号量" class="headerlink" title="用于同步的二进制信号量"></a>用于同步的二进制信号量</h2><p>二进制信号量 API 的中断安全版本可以用于在每次特定中断发生时解除任务阻塞，从而有效地将任务与中断同步。这允许大部分中断事件处理在同步任务中实现，只有非常快和短的部分直接留在ISR中。如前一节所述，二进制信号量用于将中断处理 “延迟” 到任务[1]。</p>
+<blockquote>
+<p>[1] 任务：使用直接到任务的通知将一个任务从中断中解禁，比使用二进制信号量更有效率。直接到任务的通知在第9章 “任务通知 “中才会涉及。</p>
+</blockquote>
+<p>正如之前在图 48 中所展示的，如果中断处理是特别时间关键的，则可以设置延迟处理任务的优先级，以确保该任务总是抢占系统中的其他任务。然后可以实现 ISR 以包含对 <code>portYIELD_FROM_ISR()</code> 的调用，确保 ISR 直接返回到中断处理被延迟到的任务。这样做的效果是确保整个事件处理在在时间上连续执行 ( 没有中断 )，就好像它全部在ISR本身内实现一样。图 49 重复了图 48 中的场景，但是更新了文本以描述如何使用信号量来控制延迟处理任务的执行。</p>
+<p><img src="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/image-20240401132340213.png" alt="图 49 使用二进制信号量实现延迟中断处理"></p>
+<p>延迟处理任务使用对信号量的阻塞 <code>"take"</code> 调用作为进入阻塞状态以等待事件发生的方法。当事件发生时，ISR 对同一信号量使用 <code>"give" </code> 操作来解锁任务，以便继续进行所需的事件处理。</p>
+<p><code>"Taking a semaphore (获取信号量)"</code> 和 <code>"giving a semaphore (给出信号量)"</code> 是根据其使用场景具有不同含义的概念。在这种中断同步场景中，二进制信号量在概念上可以被视为长度为 1 的队列。队列在任何时候最多可以包含一项，因此始终要么为空，要么为满（因此是二进制）。通过调用 <code>xSemaphoreTake()</code>，中断处理被延迟到的任务有效地试图用一个阻塞时间从队列中读取数据，从而导致任务在队列为空时进入阻塞状态。当事件发生时，ISR 使用 <code>xSemaphoreGiveFromISR()</code> 函数将一个令牌（信号量）放入队列中，使队列变满。这将导致任务退出阻塞状态并移除令牌，使队列再次为空。当任务完成其处理后，它会再次尝试从队列中读取，并发现队列为空，然后重新进入阻塞状态以等待下一个事件。图 50 演示了这个序列。</p>
+<p>图 50 显示了中断 <code>"giving (给出)"</code> 信号量，即使它没有首先 <code>"taking (获取)"</code> 信号量，以及任务 <code>"taking (获取)"</code> 信号量，但从未将其给出 (giving it back)。这就是为什么该场景被描述为在概念上类似于向队列写入和从队列读取的原因。它经常会引起混乱，因为它不遵循与其他信号量使用场景相同的规则，在其他信号量使用场景中，获取 (takes) 信号量的任务必须始终将其给出 (give it back)，例如第 7 章 “资源管理” 中描述的场景。</p>
+<img src="Chapter 6 中断管理/image-20240401141329400.png" alt="图 50 使用二进制信号量使任务与中断同步" style="zoom:67%;">
+
+<h3 id="xSemaphoreCreateBinary-API函数"><a href="#xSemaphoreCreateBinary-API函数" class="headerlink" title="xSemaphoreCreateBinary() API函数"></a>xSemaphoreCreateBinary() API函数</h3><p>FreeRTOS V9.0.0 还包括 <code>xSemaphoreCreateBinaryStatic()</code> 函数，该函数在编译时静态地分配创建二进制信号量所需的内存 : 所有各种类型的 FreeRTOS 信号量的句柄都存储在 <code>SemaphoreHandle_t</code> 类型的变量中。</p>
+<p>在使用信号量之前，必须先创建它。要创建一个二进制信号量，请使用 <code>xSemaphoreCreateBinary()</code> API 函数 [1]。</p>
+<blockquote>
+<p>[1] : 一些信号量 API 函数实际上是宏，而不是函数。为简单起见，在本书中，它们都被称为函数。</p>
+</blockquote>
+<pre class=" language-c"><code class="language-c">SemaphoreHandle_t <span class="token function">xSemaphoreCreateBinary</span><span class="token punctuation">(</span> <span class="token keyword">void</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>清单 89. <code>xSemaphoreCreateBinary()</code> API 函数原型</p>
+<p>表 33. <code>xSemaphoreCreateBinary()</code> 的返回值</p>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>返回值</td>
+<td>如果返回的是 <code>NULL</code>，则无法创建信号量，因为没有足够的堆内存可供FreeRTOS分配给信号量数据结构。<br>如果返回的值不是<code>NULL</code>，则表明该信号已被成功创建。返回值应存储为创建的信号量的句柄。</td>
+</tr>
+</tbody></table>
+<h3 id="xSemaphoreTake-API函数"><a href="#xSemaphoreTake-API函数" class="headerlink" title="xSemaphoreTake() API函数"></a>xSemaphoreTake() API函数</h3><p> <code>"Taking (获取)"</code> 信号量意味着 <code>"obtain (获得)"</code> 或 <code>receive (接收)</code> 信号量。仅当信号量可用时才可以获取该信号量。</p>
+<p>所有不同类型的 FreeRTOS 信号量，除了递归互斥锁，都可以使用 <code>xSemaphoreTake()</code> 函数。</p>
+<p><code>xSemaphoreTake()</code> 不能从一个中断服务例程中使用。</p>
+<pre class=" language-c"><code class="language-c">BaseType_t <span class="token function">xSemaphoreTake</span><span class="token punctuation">(</span> SemaphoreHandle_t xSemaphore<span class="token punctuation">,</span> TickType_t xTicksToWait <span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>清单 90. <code>xSemaphoreTake()</code> 的 API 函数原型</p>
+<p>表 34. <code>xSemaphoreTake()</code> 参数和返回值</p>
+<table>
+<thead>
+<tr>
+<th>参数名称/返回值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>xSemaphore</code></td>
+<td>被 <code>"taking (获取)"</code> 的信号量。<br>信号量由 <code>SemaphoreHandle_t</code> 类型的变量引用。必须先显式创建它，然后才能使用它。</td>
+</tr>
+<tr>
+<td><code>xTicksToWait</code></td>
+<td>如果信号量尚不可用，任务应保持在阻塞状态以等待信号量的最长时间。<br>如果<code>xTicksToWait</code> 为 0，那么如果信号量不可用，<code>xSemaphoreTake()</code> 将立即返回。<br>阻塞时间是以滴答周期指定的，因此它表示的绝对时间取决于滴答频率。宏pdMS_TO_TICKS() 可用于将以毫秒为单位指定的时间转换为以滴答为单位指定的时间。<br>如果在 <code>FreeRTOSConfig.h</code> 中将 <code>INCLUDE_vTaskSuspend</code> 设置为 1，则将 <code>xTicksToWait</code> 设置为 <code>portMAX_DELAY</code> 将导致任务无限期等待 ( 没有超时期限 )。</td>
+</tr>
+<tr>
+<td>返回值</td>
+<td>有两个可能的返回值：<br>1. <code>pdPASS</code><br>仅当调用 <code>xSemaphoreTake()</code> 成功获取信号量时才返回 <code>pdPASS</code>。<br>如果指定了阻塞时间（<code>xTicksToWait</code> 不是 0 ），则调用任务可能被置于阻塞状态以等待信号量 (如果信号量不是立即可用)，但信号量在阻止时间到期之前变为可用。<br>2. <code>pdFALSE</code><br>信号量不可用。<br>如果指定了阻塞时间（<code>xTicksToWait</code> 不是0），则调用任务将被置于阻塞状态以等待信号量变为可用，但阻塞时间在此之前已过期。<p></p></td>
+</tr>
+</tbody></table>
+<h3 id="xSemaphoreGiveFromISR-API函数"><a href="#xSemaphoreGiveFromISR-API函数" class="headerlink" title="xSemaphoreGiveFromISR() API函数"></a>xSemaphoreGiveFromISR() API函数</h3><p>可以使用<code>xSemaphoreGiveFromISR()</code>函数 <code>"giving (给出)"</code> 二进制和计数信号量。</p>
+<blockquote>
+<p>计数信号量将在本书后面的章节中介绍。</p>
+</blockquote>
+<p><code>xSemaphoreGiveFromISR()</code> 是 <code>xSemaphoreGive()</code> 的中断安全版本，所以具有 <code>pxHigherPriorityTaskWoken</code> 参数，这在本章开始时已经描述过。</p>
+<pre class=" language-c"><code class="language-c">BaseType_t <span class="token function">xSemaphoreGiveFromISR</span><span class="token punctuation">(</span> SemaphoreHandle_t xSemaphore<span class="token punctuation">,</span> 
+                                 BaseType_t <span class="token operator">*</span>pxHigherPriorityTaskWoken <span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>清单91. <code>xSemaphoreGiveFromISR()</code> API 函数原型</p>
+<p>表35. <code>xSemaphoreGiveFromISR()</code> 参数和返回值</p>
+<table>
+<thead>
+<tr>
+<th>参数名称/返回值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>xSemaphore</code></td>
+<td>将要被 <code>"给出"</code> 的信号量。<br>一个信号量是由一个类型为 <code>SemaphoreHandle_t</code> 的变量来引用的，并且必须在使用前显式创建。</td>
+</tr>
+<tr>
+<td><code>pxHigherPriorityTaskWoken</code></td>
+<td>单个信号量可能会阻塞一个或多个任务，等待信号量可用。调用 <code>xSemaphoreGiveFromISR()</code> 可以使信号量可用，从而使等待信号量的任务离开阻塞状态。如果调用 <code>xSemaphoreGiveFromISR()</code> 导致一个任务离开阻塞状态，并且未阻塞任务的优先级高于当前正在执行的任务 (被中断的任务)，那么，在内部，<code>xSemaphoreGiveFromISR()</code> 将 <code>*pxHigherPriorityTaskWoken</code> 设置为 <code>pdTRUE</code>。<br>如果 <code>xSemaphoreGiveFromISR()</code> 把这个值设置为  <code>pdTRUE</code>。则通常应在退出中断之前执行上下文切换。这将确保中断直接返回到最高优先级就绪状态任务。</td>
+</tr>
+<tr>
+<td>返回值</td>
+<td>有两个可能的返回值：<br>1. <code>pdPASS</code><br>只有当对 <code>xSemaphoreGiveFromISR()</code> 的调用成功时，才会返回 <code>pdPASS</code>。<br>2. <code>pdFAIL</code><br>如果信号量已经可用，则不能被 <code>"给出"</code>，并且 <code>xSemaphoreGiveFromISR()</code> 将返回 <code>pdFAIL</code>。<p></p></td>
+</tr>
+</tbody></table>
+<h3 id="示例-16-使用二进制信号量使一个任务与中断同步"><a href="#示例-16-使用二进制信号量使一个任务与中断同步" class="headerlink" title="示例 16. 使用二进制信号量使一个任务与中断同步"></a>示例 16. 使用二进制信号量使一个任务与中断同步</h3><p>此示例使用二进制信号量从中断服务例程中取消阻阻塞任务 — 有效地将任务与中断同步。</p>
+<p>一个简单的周期性任务被用来每 500 毫秒产生一次软件中断。一个软件中断是为了方便而使用的，由于在某些目标环境中挂钩到真实中断的复杂性，因此使用软件中断是为了方便。清单 92 显示了周期性任务的实现。请注意，该任务在生成中断之前和之后都打印出一个字符串。这允许在执行示例时产生的输出中观察执行顺序。</p>
+<pre class=" language-c"><code class="language-c"><span class="token comment" spellcheck="true">/* 本例中使用的软件中断的编号。显示的代码来自 Windows 工程，
+其中数字0到2是由 FreeRTOS Windows 移植本身使用的，
+所以 3 是应用程序可用的第一个数字。*/</span>
+<span class="token macro property">#<span class="token directive keyword">define</span> mainINTERRUPT_NUMBER 3</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">vPeriodicTask</span><span class="token punctuation">(</span> <span class="token keyword">void</span> <span class="token operator">*</span>pvParameters <span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">const</span> TickType_t xDelay500ms <span class="token operator">=</span> <span class="token function">pdMS_TO_TICKS</span><span class="token punctuation">(</span><span class="token number">500UL</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+         <span class="token comment" spellcheck="true">/* 和大多数任务一样，这个任务是在一个无限循环中实现的。*/</span>
+         <span class="token keyword">for</span><span class="token punctuation">(</span> <span class="token punctuation">;</span><span class="token punctuation">;</span> <span class="token punctuation">)</span>
+         <span class="token punctuation">{</span>
+             <span class="token comment" spellcheck="true">/* 阻塞直到再次产生软件中断。*/</span>
+              <span class="token function">vTaskDelay</span><span class="token punctuation">(</span> xDelay500ms <span class="token punctuation">)</span><span class="token punctuation">;</span>
+             <span class="token comment" spellcheck="true">/* 生成中断，在中断产生前后打印信息。这样就可以从输出中看出执行的顺序。
+             用于生成软件中断的语法取决于所使用的 FreeRTOS 移植。下面使用的语法只能用于
+             FreeRTOS Windows 移植，在该移植中，这种中断只是模拟的。*/</span>
+              <span class="token function">vPrintString</span><span class="token punctuation">(</span> <span class="token string">"Periodic task - About to generate an interrupt.\r\n"</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+              <span class="token function">vPortGenerateSimulatedInterrupt</span><span class="token punctuation">(</span> mainINTERRUPT_NUMBER <span class="token punctuation">)</span><span class="token punctuation">;</span>
+              <span class="token function">vPrintString</span><span class="token punctuation">(</span> <span class="token string">"Periodic task - Interrupt generated.\r\n\r\n\r\n"</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+         <span class="token punctuation">}</span> 
+<span class="token punctuation">}</span>
+</code></pre>
+<p>清单 92. 示例 16 中周期性生成软件中断的任务的实现</p>
+<p>清单 93 显示了中断处理被延迟到的任务的实现 —— 通过使用二进制信号量与软件中断同步的任务。同样，在任务的每次迭代中都会打印出一个字符串，因此从执行示例时产生的输出中可以明显看出任务和中断执行的顺序。</p>
+<p>需要注意的是，虽然清单 93 中所示的代码足够满足由软件生成中断的示例 16 ，但它不足以满足由硬件外设生成中断的场景。</p>
+<pre class=" language-c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">vHandlerTask</span><span class="token punctuation">(</span> <span class="token keyword">void</span> <span class="token operator">*</span>pvParameters <span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">/* 和大多数任务一样，这个任务是在一个无限循环中实现的。 */</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token punctuation">;</span><span class="token punctuation">;</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">/* 使用信号量来等待事件。信号量是在调度程序启动之前创建的，
+        因此在此任务第一次运行之前。任务无限期地阻塞，
+        这意味着这个函数调用只会在成功获得信号量后返回——
+        所以不需要检查 xSemaphoreTake() 返回的值。*/</span>
+        <span class="token function">xSemaphoreTake</span><span class="token punctuation">(</span>xBinarySemaphore<span class="token punctuation">,</span> portMAX_DELAY<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">/* 要到达这里，这个事件必须已经发生。处理该事件 (在本例中，只是打印出一条信息)。 */</span>
+        <span class="token function">vPrintString</span><span class="token punctuation">(</span><span class="token string">"Handler task - Processing event.\r\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>清单 93. 示例 16 中延迟中断处理的任务 (与中断同步的任务) 的实现。</p>
+<p>清单 94 显示了 ISR 。除了 <code>"给出"</code> 信号量以取消阻塞中断处理被延迟到的任务之外，几乎没有什么作用。</p>
+<p>注意 <code>xHigherPriorityTaskWoken</code> 变量是如何被使用的。在调用 <code>xSemaphoreGiveFromISR()</code> 之前，它被设置为 <code>pdFALSE</code> ，然后在调用 <code>portYIELD_FROM_ISR()</code> 时作为参数使用。如果 <code>xHigherPriorityTaskWoken</code> 等于 <code>pdTRUE</code>，则将在 <code>portYIELD_FROM_ISR()</code> 宏请求上下文切换。</p>
+<p>ISR 的原型和用于强制上下文切换的宏，对于FreeRTOS Windows 移植都是正确的，对于其他 FreeRTOS 移植可能有所不同。请参阅 <a target="_blank" rel="noopener" href="http://www.example.com/">www.example.com</a> 网站上的移植特定文档页面，以及 FreeRTOS 下载中提供的示例，以查找您正在使用的移植所需的语法。</p>
+<p>与运行 FreeRTOS 的大多数架构不同，FreeRTOS 的 Windows 移植需要一个 ISR 来返回一个值。与 Windows 移植一起提供的 <code>portYIELD_FROM_ISR()</code> 宏的实现包括 return 语句，因此清单 94 没有显示显式返回的值。</p>
+<pre class=" language-c"><code class="language-c"><span class="token keyword">static</span> uint32_t <span class="token function">ulExampleInterruptHandler</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    BaseType_t xHigherPriorityTaskWoken<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">/* xHigherPriorityTaskWoken参数必须被初始化为pdFALSE，
+    因为如果需要进行上下文切换，它将在中断安全 API 函数中被设置为 pdTRUE。 */</span>
+    xHigherPriorityTaskWoken <span class="token operator">=</span> pdFALSE<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">/* “给出” semaphore以解除对任务的阻塞，将 xHigherPriorityTaskWoken 
+    的地址作为中断安全API函数的参数 pxHigherPriorityTaskWoken 传入。 */</span>
+    <span class="token function">xSemaphoreGiveFromISR</span><span class="token punctuation">(</span>xBinarySemaphore<span class="token punctuation">,</span> <span class="token operator">&amp;</span>xHigherPriorityTaskWoken<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment" spellcheck="true">/* 将 xHigherPriorityTaskWoken 的值传给 portYIELD_FROM_ISR()。
+  如果 xHigherPriorityTaskWoken 在 xSemaphoreGiveFromISR() 中被设置为 pdTRUE，
+  那么调用 portYIELD_FROM_ISR() 将请求进行上下文切换。
+  如果 xHigherPriorityTaskWoken 仍然是 pdFALSE，
+  那么调用 portYIELD_FROM_ISR() 将没有任何影响。
+  与大多数 FreeRTOS 移植不同， Windows 移植要求 ISR 返回一个值 ——
+  return 语句在 Windows 版本的 portYIELD_FROM_ISR() 中。*/</span>
+    <span class="token function">portYIELD_FROM_ISR</span><span class="token punctuation">(</span>xHigherPriorityTaskWoken<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>清单 94. 示例 16 中使用的软件中断的 ISR</p>
+<p><code>main() </code> 函数创建二进制信号量，创建任务，安装中断处理 ( interrupt handler ) 程序。并启动调度程序。实现如清单 95 所示。</p>
+<p>为安装中断处理程序而调用的函数的语法特定于 FreeRTOS Windows 移植，对于其他 FreeRTOS 移植可能有所不同。请参考 FreeRTOS.org 网站上的特定移植文档页面，以及 FreeRTOS 下载中提供的示例，以找到你正在使用的移植所需的语法。</p>
+<pre class=" language-c"><code class="language-c"><span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">/* 在使用 semaphore 之前，必须显示地创建它。在这个例子中，我们创建了一个 binary semaphore。 */</span>
+    xBinarySemaphore <span class="token operator">=</span> <span class="token function">xSemaphoreCreateBinary</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">/* 检查 semaphore 是否成功创建。*/</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>xBinarySemaphore <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">/* 创建 "处理(handler)"任务，该任务是中断处理被延迟到的任务。
+        这是将与中断同步的任务。处理任务是以高优先级创建的，
+        以确保它在中断退出后立即运行。
+        在这种情况下，我们选择了优先级 3 。 */</span>
+        <span class="token function">xTaskCreate</span><span class="token punctuation">(</span>vHandlerTask<span class="token punctuation">,</span> <span class="token string">"Handler"</span><span class="token punctuation">,</span> <span class="token number">1000</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">/* 创建将定期生成软件中断的任务。这个任务的优先级低于处理任务，
+        以确保每次处理任务退出阻塞状态时它将被抢占。 */</span>
+        <span class="token function">xTaskCreate</span><span class="token punctuation">(</span>vPeriodicTask<span class="token punctuation">,</span> <span class="token string">"Periodic"</span><span class="token punctuation">,</span> <span class="token number">1000</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">/* 安装软件中断的处理程序。这样做所需的语法取决于正在使用的FreeRTOS移植。
+        这里显示的语法只能用于 FreeRTOS windows 移植，在那里这种中断只是模拟的。 */</span>
+        <span class="token function">vPortSetInterruptHandler</span><span class="token punctuation">(</span>mainINTERRUPT_NUMBER<span class="token punctuation">,</span> ulExampleInterruptHandler<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">/* 启动调度器，使创建的任务开始执行。 */</span>
+        <span class="token function">vTaskStartScheduler</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">/* 正常情况下，绝对不能达到下面这一行。 */</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token punctuation">;</span><span class="token punctuation">;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>清单 95. 示例 16 中 <code>main()</code> 的实现</p>
+<p>示例 16 产生的输出如图 51 所示。正如预期的那样，<code>vHandlerTask()</code> 在中断产生后立即进入了运行状态，因此任务的输出会拆分周期性任务产生的输出。在图52中提供了进一步的解释。</p>
+<p><img src="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/image-20240408200251795.png" alt="图 51. 执行示例 16 时产生的输出"></p>
+<p><img src="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/image-20240408200543993.png" alt="图 52. 执行例 16 时的执行顺序"></p>
+<h3 id="改进示例16中使用的任务的实现"><a href="#改进示例16中使用的任务的实现" class="headerlink" title="改进示例16中使用的任务的实现"></a>改进示例16中使用的任务的实现</h3><p>示例 16 使用一个二进制信号量来同步一个任务和一个中断。其执行顺序如下：</p>
+<ol>
+<li>中断发生了。</li>
+<li>ISR 执行并 <code>"给出"</code> 信号量以解除对任务的阻塞。</li>
+<li>任务在 ISR 之后立即执行，并 <code>"获取"</code> 了信号量。</li>
+<li>任务处理了该事件，然后试图再次 <code>"获取"</code> 信号量——进入阻塞状态，因为信号量还不可用（另一个中断还没有发生）。</li>
+</ol>
+<p>示例 16 中使用的任务的结构仅在中断以相对低的频率发生时是适当的。要理解其中的原因，我们可以考虑一下，如果在任务完成对第一个中断的处理之前，又发生了第二个、第三个中断，会发生什么：</p>
+<ul>
+<li>当第二个 ISR 执行时，信号量将为空，所以 ISR 将 <code>"给出"</code> 信号量，并且任务将在完成处理第一个事件之后立即处理第二个事件。该场景如图 53 所示。</li>
+<li>当第三个 ISR 执行时，信号量已经可用，防止ISR再次给出信号量，所以任务不会知道第三个事件已经发生。这种情况在图54中显示。</li>
+</ul>
+<img src="Chapter 6 中断管理/image-20240408204641581.png" alt="图 53. 在任务处理完第一个事件之前发生一个中断时的情景" style="zoom:67%;">
+
+
+
+<img src="Chapter 6 中断管理/image-20240408205305113.png" alt="图 54. 在任务处理完第一个事件之前发生两个中断时的情景" style="zoom:67%;">
+
+
+
+<p>示例 16 中使用的延迟中断处理任务（如清单 93 所示）被构建为在每次调用 <code>xSemaphoreTake()</code> 之间仅处理一个事件。这对于示例 16 来说已经足够了，因为生成事件的中断是由软件触发的，并且发生在可预测的时间。在实际应用中，中断是由硬件产生的，并且发生的时间是不可预测的。因此，为了最大限度地减少错过中断的机会，必须构建延迟中断处理任务，以便它处理每次调用 <code>xSemaphoreTake()</code> 之间已经可用的所有事件 [1]。清单 96 对此进行了演示，其中展示了如何构建 UART 的延迟中断处理程序。在清单 96 中，假设 UART 在每次接收到字符时生成接收中断，并且 UART 将接收到的字符放入硬件 FIFO ( 硬件缓冲区 ) 中。</p>
+<blockquote>
+<p> [1] 事件：或者，也可以使用计数信号量或直接到任务的通知来对事件进行计数。计数信号量将在下一节中描述。第 9 章 “任务通知” 中描述了直接到任务的通知。直接到任务的通知是首选方法，因为它们在运行时间和 RAM 使用方面都是最有效率的。</p>
+</blockquote>
+<p>示例 16 中使用的延迟中断处理任务还有一个弱点；它在调用 <code>xSemaphoreTake()</code> 时没有使用超时。相反，该任务将 <code>portMAX_DELAY</code> 作为 <code>xSemaphoreTake()</code> 的 <code>xTicksToWait</code> 参数传递，这会导致任务无限期地等待 ( 没有超时期限 ) 信号量可用。无限期超时经常被用在示例代码中，因为它们的使用简化了示例的结构，从而使示例更易于理解。然而，在实际应用中，无限期超时通常是不好的做法，因为它们使得从错误中恢复变得困难。例如，考虑这样的场景：任务正在等待中断以提供信号量，但硬件中的错误状态阻止中断产生 ：</p>
+<ul>
+<li>如果任务在没有超时的情况下等待，它将不知道错误状态，并将永远等待。</li>
+<li>如果任务在等待时有超时，则 <code>xSemaphoreTake()</code>  将在超时到期时返回 <code>pdFAIL</code> ，然后任务可以在下次执行时检测并清除错误。清单 96 也演示了这个场景。</li>
+</ul>
+<pre class=" language-c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">vUARTReceiveHandlerTask</span><span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span>pvParameters<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">/* xMaxExpectedBlockTime 保存两个中断之间预期的最大时间。 */</span>
+    <span class="token keyword">const</span> TickType_t xMaxExpectedBlockTime <span class="token operator">=</span> <span class="token function">pdMS_TO_TICKS</span><span class="token punctuation">(</span><span class="token number">500</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">/* 和大多数任务一样，这个任务是在一个无限循环中实现的。 */</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token punctuation">;</span><span class="token punctuation">;</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">/* semaphore 由 UART 的接收(Rx)中断 "给出"。
+        等待下一个中断的时间最多为 xMaxExpectedBlockTime 个滴答。*/</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">xSemaphoreTake</span><span class="token punctuation">(</span>xBinarySemaphore<span class="token punctuation">,</span> xMaxExpectedBlockTime<span class="token punctuation">)</span> <span class="token operator">==</span> pdPASS<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">/* 获得了 semaphore 。在再次调用 xSemaphoreTake() 之前，
+            处理所有挂起的 Rx 事件。每个 Rx 事件都会在UART 的接收FIFO中放置一个字符，
+            并且假定 UART_RxCount() 返回 FIFO 中的字符数。*/</span>
+            <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token function">UART_RxCount</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">/* 假设 UART_ProcessNextRxEvent() 处理一个Rx字符，
+                将 FIFO 中的字符数减少 1 。 */</span>
+                <span class="token function">UART_ProcessNextRxEvent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token comment" spellcheck="true">/* 没有更多挂起的 Rx 事件(FIFO 中没有更多的字符)，
+            所以循环返回并调用 xSemaphoreTake() 以等待下一个中断。
+            在代码的这一点与调用 xSemaphoreTake() 之间发生的任何中断
+            都将被锁在 semaphore 中，所以不会丢失。 */</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">else</span>
+        <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">/* 在预期时间内未收到事件。检查并在必要时清除 UART 中
+            可能阻止 UART 生成更多中断的任何错误条件。 */</span>
+            <span class="token function">UART_ClearErrors</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>清单 96. 推荐的延迟中断处理任务的构建，以 UART 接收处理程序为例</p>
+<h2 id="计数信号量"><a href="#计数信号量" class="headerlink" title="计数信号量"></a>计数信号量</h2><p>正如二进制信号量可以被认为是长度为 1 的队列一样，计数信号量可以被认为是长度大于 1 的队列。任务对存储在队列中的数据不感兴趣，只对队列中的项目数量感兴趣。<code>FreeRTOSConfig.h</code> 中的 <code>configUSE_COUNTING_SEMAPHORES</code>必须设置为 1 ，以使计数信号量可用 。</p>
+<p>每次 <code>"给出"</code> 计数信号量时，都会使用其队列中的另一个空间。队列中的项目数是信号量的 <code>"计数(count)"</code> 值。</p>
+<ol>
+<li><p>计数事件 [1]</p>
+<p>在这种情况下，事件处理程序将在每次事件发生时 <code>"给出"</code> 一个信号量，从而导致信号量的计数值在每次 <code>"给出"</code> 时递增。任务每次处理事件时都会 <code>"获取"</code> 一个信号量，从而导致信号量的计数值在每次  <code>"获取"</code>  时递减。计数值是已发生的事件数与已处理的事件数之间的差值。该机制如图 55 所示。</p>
+<p>创建用于对事件进行计数的计数信号量时，其初始计数值为 0 。</p>
+</li>
+</ol>
+<blockquote>
+<p>[1] 使用直接到任务的通知来计数事件比使用计数信号量更有效。 直到第 9 章才介绍直接到任务的通知。</p>
+</blockquote>
+<ol>
+<li><p>资源管理</p>
+<p>在这种情况下，计数值指示可用资源的数量。为了获得对资源的控制，任务必须首先获得信号量——减少信号量的计数值。当计数值达到 0 时，表示没有空闲资源。当任务完成资源使用时，它会归还信号量——增加信号量的计数值。</p>
+<p>创建用于管理资源的计数信号量，使其初始计数值等于可用资源的数量。第 7 章介绍了如何使用信号量管理资源。</p>
+</li>
+</ol>
+<img src="Chapter 6 中断管理/image-20240409011504838.png" alt="图 55. 使用一个计数信号量来 '计数' 事件" style="zoom:67%;">
+
+
+
+<h3 id="xSemaphoreCreateCounting-API函数"><a href="#xSemaphoreCreateCounting-API函数" class="headerlink" title="xSemaphoreCreateCounting() API函数"></a>xSemaphoreCreateCounting() API函数</h3><p>FreeRTOS V9.0.0还包括 <code>xSemaphoreCreateCountingStatic()</code> 函数，该函数在编译时静态地分配创建计数信号量所需的内存 : 所有不同类型的 FreeRTOS 信号量的句柄都存储在 <code>SemaphoreHandle_t</code> 类型的变量中。</p>
+<p>在使用信号量之前，必须先创建它。要创建一个计数信号量，请使用 <code>xSemaphoreCreateCounting()</code> API 函数。</p>
+<pre class=" language-c"><code class="language-c">SemaphoreHandle_t <span class="token function">xSemaphoreCreateCounting</span><span class="token punctuation">(</span> UBaseType_t uxMaxCount<span class="token punctuation">,</span>
+                                            UBaseType_t uxInitialCount <span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>清单97. <code>xSemaphoreCreateCounting()</code> API 函数原型</p>
+<p>表36. <code>xSemaphoreCreateCounting()</code> 的参数和返回值</p>
+<table>
+<thead>
+<tr>
+<th>参数名称/返回值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>uxMaxCount</code></td>
+<td>信号量将计数到的最大值。继续用队列来比喻，<code>uxMaxCount</code> 值实际上就是队列的长度。<br>当信号量用于计数或锁存事件时，<code>uxMaxCount</code> 是可以锁存的最大事件数。<br>当信号量用于管理对资源集合的访问时，<code>uxMaxCount</code> 应设置为可用资源的总数。</td>
+</tr>
+<tr>
+<td><code>uxInitialCount</code></td>
+<td>信号量创建后的初始计数值。<br>当信号量用于计数或锁存事件时，<code>uxInitialCount</code>应设置为 0 ——因为据推测，当创建信号量时，还没有事件发生。<br>当信号量用于管理对资源集合的访问时，<code>uxInitialCount</code> 应设置为等于 <code>uxMaxCount</code> ，因为据推测，当创建信号量时，所有的资源都是可用的。</td>
+</tr>
+<tr>
+<td>返回值</td>
+<td>如果返回 <code>NULL</code> ，则无法创建信号量，因为没有足够的堆内存可供 FreeRTOS 分配信号量的数据结构。第 2 章提供了更多关于堆内存管理的信息。<br>返回非 <code>NULL</code> 值表示已经成功创建了信号量。返回值应存储为创建的信号量的句柄。</td>
+</tr>
+</tbody></table>
+<h3 id="例-17-使用计数信号量将任务与中断同步"><a href="#例-17-使用计数信号量将任务与中断同步" class="headerlink" title="例 17. 使用计数信号量将任务与中断同步"></a>例 17. 使用计数信号量将任务与中断同步</h3><p>示例 17 通过使用计数信号量代替二进制信号量来改进示例 16 的实现。<code>main()</code> 被修改为包含一个对 <code>xSemaphoreCreateCounting()</code> 的调用，以代替对 <code>xSemaphoreCreateBinary()</code> 的调用。新的 API 调用如清单 98 所示。</p>
+<pre class=" language-c"><code class="language-c"><span class="token comment" spellcheck="true">/* 在使用semaphore之前，必须显式创建它。
+在这个例子中，一个 counting semaphore 被创建。
+创建的 semaphore 的最大计数值为 10，初始计数值为0。 */</span>
+xCountingSemaphore <span class="token operator">=</span> <span class="token function">xSemaphoreCreateCounting</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>清单 98. 示例 17 中用于创建计数信号量的 <code>xSemaphoreCreateCounting()</code> 调用</p>
+<p>为了模拟高频率发生的多个事件，中断服务例程被改变为在每个中断中 <code>"给出"</code> 信号量不止一次。每个事件都被锁存在信号量的计数值中。修改后的中断服务例程如清单 99 所示。</p>
+<pre class=" language-c"><code class="language-c"><span class="token keyword">static</span> uint32_t <span class="token function">ulExampleInterruptHandler</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    BaseType_t xHigherPriorityTaskWoken<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">/* xHigherPriorityTaskWoken 参数必须被初始化为 pdFALSE，
+    因为如果需要进行上下文切换，它将在中断安全 API 函数中被设置为pdTRUE。 */</span>
+    xHigherPriorityTaskWoken <span class="token operator">=</span> pdFALSE<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">/* 多次 "给出" semaphore 。第一次将解除对延迟的中断处理任务的阻塞，
+    接下来的 "给出 "是为了证明 semaphore 锁存事件，
+    以允许中断延迟到的任务依次处理它们，而不会丢失事件。
+    这模拟了处理器接收到的多个中断，即使在这种情况下，事件是在单个中断发生内模拟的。 */</span>
+    <span class="token function">xSemaphoreGiveFromISR</span><span class="token punctuation">(</span>xCountingSemaphore<span class="token punctuation">,</span> <span class="token operator">&amp;</span>xHigherPriorityTaskWoken<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">xSemaphoreGiveFromISR</span><span class="token punctuation">(</span>xCountingSemaphore<span class="token punctuation">,</span> <span class="token operator">&amp;</span>xHigherPriorityTaskWoken<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">xSemaphoreGiveFromISR</span><span class="token punctuation">(</span>xCountingSemaphore<span class="token punctuation">,</span> <span class="token operator">&amp;</span>xHigherPriorityTaskWoken<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">/* 将 xHigherPriorityTaskWoken 的值传给portYIELD_FROM_ISR()。
+    如果 xHigherPriorityTaskWoken 在 xSemaphoreGiveFromISR() 中被设置为pdTRUE，
+    那么调用 portYIELD_FROM_ISR() 将请求进行上下文切换。
+    如果 xHigherPriorityTaskWoken 仍然是 pdFALSE ，
+    那么调用 portYIELD_FROM_ISR() 将没有任何影响。
+    与大多数 FreeRTOS 移植不同， Windows 移植要求 ISR 返回一个值——
+    return 语句在 Windows 版本的 portYIELD_FROM_ISR() 中。 */</span>
+    <span class="token function">portYIELD_FROM_ISR</span><span class="token punctuation">(</span>xHigherPriorityTaskWoken<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>清单 99. 示例 17 所使用的中断服务例程的实现</p>
+<p>所有其他的函数与示例 16 中使用的函数相比都没有修改。</p>
+<p>示例 17 执行时产生的输出如图 56 所示。可以看出，在每次产生中断时，中断处理被推迟到的任务会处理所有三个 [模拟] 事件。这些事件被锁存在信号的计数值中，允许任务依次处理它们。</p>
+<p><img src="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/image-20240409130405568.png" alt="图 56. 执行示例 17 时产生的输出"></p>
+<h2 id="延迟工作到-RTOS-守护进程任务"><a href="#延迟工作到-RTOS-守护进程任务" class="headerlink" title="延迟工作到 RTOS 守护进程任务"></a>延迟工作到 RTOS 守护进程任务</h2><p>到目前为止，所介绍的延迟中断处理的示例都要求应用程序编写者为每个使用延迟处理技术的中断创建一个任务。还可以使用 <code>xTimerPendFunctionCallFromISR()</code> [1] API 函数将中断处理延迟到 RTOS 守护进程任务 (daemon task) 中 —— 无需为每个中断创建一个单独的任务。将中断处理延迟到守护任务被称为 <code>"集中延迟中断处理"</code> 。</p>
+<blockquote>
+<p>[1] xTimerPendFunctionCallFromISR()：在第 5 章中指出，守护进程任务最初被称为定时器服务任务，因为它最初只用来执行软件定时器回调函数。因此，<code>xTimerPendFunctionCall()</code> 是在 <code>timers.c</code> 中实现的，并且根据以实现函数的文件的名称为前缀的惯例，函数的名称以 <code>"Timer"</code> 为前缀。</p>
+</blockquote>
+<p>第 5 章描述了与软件定时器相关的 FreeRTOS API 函数如何将命令发送到定时器命令队列上的守护进程任务。 <code>xTimerPendFunctionCall()</code>  和 <code>xTimerPendFunctionCallFromISR()</code> API 函数使用相同的定时器命令队列向守护进程任务发送 <code>"execute function (执行函数) "</code>命令。然后，发送到守护进程任务的函数在守护进程任务的上下文中被执行。</p>
+<p>集中延迟中断处理的优点包括 ：</p>
+<ul>
+<li><p>较低的资源使用量</p>
+<p>它消除了为每个延迟中断创建一个单独任务的需要。</p>
+</li>
+<li><p>简化的用户模型</p>
+<p>延迟中断处理函数是标准 C 函数。</p>
+</li>
+</ul>
+<p>集中式延时中断处理的缺点包括：</p>
+<ul>
+<li><p>灵活性较低</p>
+<p>不可能单独设置每个延迟中断处理任务的优先级。每个延迟中断处理函数以守护进程任务的优先级执行。如第5章所述，守护进程任务的优先级由 <code>FreeRTOSConfig.h</code> 中的 <code>configTIMER_TASK_PRIORITY</code> 编译时配置常量设置。</p>
+</li>
+<li><p>较低的确定性</p>
+<blockquote>
+<p>英语原文是 Less determinism ，determinism —— 决定论（认为一切事物具有不以人的意志为转移的必然性）。结合下文， Less determinism 的意思应该是 : 当我们使用守护进程任务来延迟中断处理时，守护进程任务可能还同时用于处理软件定时器命令，这会导致中断处理的时间的确定性下降 ( 我猜的 )</p>
+</blockquote>
+<p><code>xTimerPendFunctionCallFromISR()</code> 将一个命令发送到定时器命令队列的尾部。在 <code>xTimerPendFunctionCallFromISR()</code> 将 <code>"execute function (执行函数)"</code> 命令发送到队列之前，守护进程任务将处理定时器命令队列中已有的命令。</p>
+</li>
+</ul>
+<p>不同的中断有不同的时序约束，因此通常在同一应用程序中使用两种延迟中断处理的方法。</p>
+<h3 id="xTimerPendFunctionCallFromISR-API-函数"><a href="#xTimerPendFunctionCallFromISR-API-函数" class="headerlink" title="xTimerPendFunctionCallFromISR() API 函数"></a>xTimerPendFunctionCallFromISR() API 函数</h3><p><code>xTimerPendFunctionCallFromISR()</code> 是 <code>xTimerPendFunctionCall()</code> 的中断安全版本。这两个 API 函数都允许由应用程序编写者提供的函数由 RTOS 守护进程任务执行，因此在 RTOS 守护进程任务的上下文中执行。要执行的函数以及函数输入参数的值都被发送到计时器命令队列上的守护进程任务。因此，该函数实际执行的时间取决于守护程序任务相对于应用程序中其他任务的优先级。</p>
+<pre class=" language-c"><code class="language-c">BaseType_t <span class="token function">xTimerPendFunctionCallFromISR</span><span class="token punctuation">(</span> 	PendedFunction_t xFunctionToPend<span class="token punctuation">,</span>
+                                            <span class="token keyword">void</span> <span class="token operator">*</span>pvParameter1<span class="token punctuation">,</span>
+                                             uint32_t ulParameter2<span class="token punctuation">,</span>
+                                            BaseType_t <span class="token operator">*</span>pxHigherPriorityTaskWoken <span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>清单 100.  <code>xTimerPendFunctionCallFromISR()</code> API 函数原型</p>
+<pre class=" language-c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">vPendableFunction</span><span class="token punctuation">(</span> <span class="token keyword">void</span> <span class="token operator">*</span>pvParameter1<span class="token punctuation">,</span> uint32_t ulParameter2 <span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>清单101. <code>xTimerPendFunctionCallFromISR()</code> 的 <code>xFunctionToPend</code> 参数中传递的函数必须符合的原型。</p>
+<p>表37.  <code>xTimerPendFunctionCallFromISR()</code> 参数和返回值</p>
+<table>
+<thead>
+<tr>
+<th>参数名称/返回值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>xFunctionToPend</code></td>
+<td>指向将在守护进程任务中执行的函数的指针 (实际上，就是函数名称 ) 。函数的原型必须与清单 101所示的相同。</td>
+</tr>
+<tr>
+<td><code>pvParameter1</code></td>
+<td>将被传递到由守护任务执行的函数中的值，作为该函数的 <code>pvParameter1</code> 参数。参数具有 void * 类型，以允许它用于传递任何数据类型。例如，整数类型可以直接转换为 void *，或者，void *可以用来指向一个结构。</td>
+</tr>
+<tr>
+<td><code>ulParameter2</code></td>
+<td>将被传递到由守护任务执行的函数中的值，作为该函数的 <code>ulParameter2</code> 参数。</td>
+</tr>
+<tr>
+<td><code>pxHigherPriorityTaskWoken</code></td>
+<td><code>xTimerPendFunctionCallFromISR()</code> 写入定时器命令队列。如果 RTOS 守护进程任务处于阻塞状态以等待定时器命令队列上的数据可用，那么写入定时器命令队列将使守护进程任务离开阻塞状态。如果守护进程任务的优先级高于当前正在执行的任务 ( 被中断的任务 ) 的优先级，那么在内部，<code>xTimerPendFunctionCallFromISR()</code> 将把 <code>*pxHigherPriorityTaskWoken</code> 设为 <code>pdTRUE</code>。<br>如果 <code>xTimerPendFunctionCallFromISR()</code> 将此值设置为 <code>pdTRUE</code>，那么在退出中断之前必须进行上下文切换。这将确保中断直接返回到守护进程任务，因为守护进程任务将是最高优先级的就绪状态任务。</td>
+</tr>
+<tr>
+<td>返回值</td>
+<td><p>有两个可能的返回值：<br>1. <code>pdPASS</code><br>如果 <code>"execute function"</code> 命令被写入定时器命令队列，则将返回 <code>pdPASS</code>。<br>2. <code>pdFAIL</code><br>如果由于定时器命令队列已满而无法将 <code>"execute function"</code> 命令写入定时器命令队列，则将返回 <code>pdFAIL</code>。第 5 章介绍了如何设置定时器命令队列的长度。</p></td>
+</tr>
+</tbody></table>
+<h3 id="示例-18-集中的延迟中断处理"><a href="#示例-18-集中的延迟中断处理" class="headerlink" title="示例 18. 集中的延迟中断处理"></a>示例 18. 集中的延迟中断处理</h3><p>示例 18 提供了与示例 16 类似的功能，但没有使用信号量，并且不创建专门用于执行中断所必需的处理的任务。相反，该处理由 RTOS 守护进程任务执行。</p>
+<p>示例 18 所使用的中断服务例程如清单 102 所示。它调用 <code>xTimerPendFunctionCallFromISR()</code>，将一个指向名为<code>vDeferredHandlingFunction()</code> 的函数的指针传递给守护进程任务。延迟的中断处理由 <code>vDeferredHandlingFunction()</code> 函数执行。</p>
+<p>中断服务程序每次执行时都会增加一个名为 <code>ulParameterValue</code> 的变量。<code>ulParameterValue</code> 在对 <code>xTimerPendFunctionCallFromISR()</code> 的调用中被用作 <code>ulParameter2</code> 的值，因此当守护程序任务执行 <code>vDeferredHandlingFunction()</code> 时，也将在对 <code>vDeferredHandlingFunction()</code> 的调用中用作 <code>ulParameter2</code> 的值。在这个例子中没有使用。本例中未使用函数的另一个参数 <code>pvParameter1</code>。</p>
+<pre class=" language-c"><code class="language-c"><span class="token keyword">static</span> uint32_t <span class="token function">ulExampleInterruptHandler</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">static</span> uint32_t ulParameterValue <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    BaseType_t xHigherPriorityTaskWoken<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">/* xHigherPriorityTaskWoken 参数必须被初始化为 pdFALSE，
+    因为如果需要进行上下文切换，它将在中断安全 API 函数中被设置为 pdTRUE。 */</span>
+    xHigherPriorityTaskWoken <span class="token operator">=</span> pdFALSE<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">/* 将指向中断的延迟处理函数的指针发送到守护进程任务。
+    不使用延迟处理函数的 pvParameter1 参数，因此只需设置为 NULL。
+    延迟处理函数的ulParameter2参数用于传递一个数字，
+    这个数字在每次执行这个中断处理程序时都会递增 1 。 */</span>
+    <span class="token function">xTimerPendFunctionCallFromISR</span><span class="token punctuation">(</span>vDeferredHandlingFunction<span class="token punctuation">,</span> <span class="token comment" spellcheck="true">/* 要执行的函数。 */</span>
+                                  <span class="token constant">NULL</span><span class="token punctuation">,</span>                      <span class="token comment" spellcheck="true">/* 未使用。 */</span>
+                                  ulParameterValue<span class="token punctuation">,</span>          <span class="token comment" spellcheck="true">/* 递增值。 */</span>
+                                  <span class="token operator">&amp;</span>xHigherPriorityTaskWoken<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    ulParameterValue<span class="token operator">++</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">/* 将xHigherPriorityTaskWoken 的值传给 portYIELD_FROM_ISR()。
+    如果 xHigherPriorityTaskWoken 在 xTimerPendFunctionCallFromISR() 中被设置为 pdTRUE， 
+    那么调用 portYELD_FROM_ISR() 将请求进行上下文切换。
+    如果 xHigherPriorityTaskWoken 仍然是 pdFALSE， 
+    那么调用 portYIELD_FROM_ISR() 将没有任何影响。
+    与大多数 FreeRTOS 移植不同，Windows 移植要求 ISR 返回一个值——
+    返回语句在 Windows 版本的 portYIELD_FROM_ISR() 中。 */</span>
+    <span class="token function">portYIELD_FROM_ISR</span><span class="token punctuation">(</span>xHigherPriorityTaskWoken<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>清单102. 示例18中使用的软件中断处理程序</p>
+<p><code>vDeferredHandlingFunction()</code> 的实现在清单 103 中显示。它打印出一个固定的字符串及其 <code>ulParameter2</code> 的参数值。</p>
+<p><code>vDeferredHandlingFunction()</code> 必须具有清单 101 中所示的原型，尽管在这个例子中，实际上只使用了它的一个参数。</p>
+<pre class=" language-c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">vDeferredHandlingFunction</span><span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span>pvParameter1<span class="token punctuation">,</span> uint32_t ulParameter2<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">/* 处理事件————在本例中只是打印出一条信息和 ulParameter2 的值。
+    pvParameter1 在本例中没有使用。 */</span>
+    <span class="token function">vPrintStringAndNumber</span><span class="token punctuation">(</span><span class="token string">"Handler function - Processing event "</span><span class="token punctuation">,</span> ulParameter2<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>清单103. 执行示例18中中断所需的处理的函数</p>
+<p>示例 18 使用的 <code>main()</code> 函数在 清单 104 中显示。它比示例 16 使用的 <code>main()</code> 函数更简单，因为它既不创建信号量，也不创建任务来执行延迟中断处理。</p>
+<p><code>vPeriodicTask()</code> 是周期性产生软件中断的任务。它的创建优先级低于守护进程任务的优先级，以确保守护进程任务一离开阻塞状态，它就会被守护进程任务抢占。</p>
+<pre class=" language-c"><code class="language-c"><span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">/* 以低于守护进程任务的优先级创建生成软件中断的任务。
+    守护进程任务的优先级由 FreeRTOSConfig.h 中的
+    configTIMER_TASK_PRIORITY 编译时配置常量设置。 */</span>
+    <span class="token keyword">const</span> UBaseType_t ulPeriodicTaskPriority <span class="token operator">=</span> configTIMER_TASK_PRIORITY <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">/* 创建将周期性生成软件中断的任务。 */</span>
+    <span class="token function">xTaskCreate</span><span class="token punctuation">(</span>vPeriodicTask<span class="token punctuation">,</span> <span class="token string">"Periodic"</span><span class="token punctuation">,</span> <span class="token number">1000</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> ulPeriodicTaskPriority<span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">/* 安装软件中断的处理程序。执行此操作所需的语法取决于所使用的 FreeRTOS 移植。
+    这里显示的语法只能用于 FreeRTOS 的 windows 移植，在那里这种中断只是模拟的。 */</span>
+    <span class="token function">vPortSetInterruptHandler</span><span class="token punctuation">(</span>mainINTERRUPT_NUMBER<span class="token punctuation">,</span> ulExampleInterruptHandler<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">/* 启动调度器，使创建的任务开始执行。 */</span>
+    <span class="token function">vTaskStartScheduler</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">/* 正常情况下，不应到达以下行。 */</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token punctuation">;</span><span class="token punctuation">;</span><span class="token punctuation">)</span>
+        <span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>清单104. 示例18中 <code>main()</code> 的实现</p>
+<p>示例 18 产生的输出如图 57 所示。守护进程任务的优先级高于生成软件中断的任务的优先级，因此一旦生成中断，守护进程任务就会执行 <code>vDeferredHandlingFunction()</code>。这导致 <code>vDeferredHandlingFunction()</code> 输出的消息出现在周期性任务输出的两个消息之间，就像使用信号量取消阻塞专用延迟中断处理任务时一样。在图 58 中提供了进一步的解释。</p>
+<p><img src="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/image-20240410001119808.png" alt="图 57. 执行示例 18 时产生的输出"></p>
+<p><img src="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/image-20240410001514315.png" alt="图 58. 执行示例 18 时的执行顺序"></p>
+<h2 id="在中断服务程序中使用队列"><a href="#在中断服务程序中使用队列" class="headerlink" title="在中断服务程序中使用队列"></a>在中断服务程序中使用队列</h2><p>二进制和计数信号量用于传递事件。队列用于传递事件和传输数据。</p>
+<p><code>xQueueSendToFrontFromISR()</code> 是 <code>xQueueSendToFront()</code> 在中断服务例程中使用安全的版本； <code>xQueueSendToBackFromISR()</code> 是 <code>xQueueSendToBack()</code> 在中断服务例程中使用安全的版本； <code>xQueueReceiveFromISR()</code> 是 <code>xQueueReceive()</code> 在中断服务例程中使用安全的版本。</p>
+<h3 id="xQueueSendToFrontFromISR-和xQueueSendToBackFromISR-API-函数"><a href="#xQueueSendToFrontFromISR-和xQueueSendToBackFromISR-API-函数" class="headerlink" title="xQueueSendToFrontFromISR() 和xQueueSendToBackFromISR() API 函数"></a>xQueueSendToFrontFromISR() 和xQueueSendToBackFromISR() API 函数</h3><pre class=" language-c"><code class="language-c">BaseType_t <span class="token function">xQueueSendToFrontFromISR</span><span class="token punctuation">(</span>QueueHandle_t xQueue<span class="token punctuation">,</span>
+                                    <span class="token keyword">void</span> <span class="token operator">*</span>pvItemToQueue
+                                    BaseType_t <span class="token operator">*</span>pxHigherPriorityTaskWoken
+                                    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>清单 105. <code>xQueueSendToFrontFromISR()</code> API 函数原型</p>
+<pre class=" language-c"><code class="language-c">BaseType_t <span class="token function">xQueueSendToBackFromISR</span><span class="token punctuation">(</span>QueueHandle_t xQueue<span class="token punctuation">,</span>
+                                   <span class="token keyword">void</span> <span class="token operator">*</span>pvItemToQueue<span class="token punctuation">,</span>
+                                   BaseType_t <span class="token operator">*</span>pxHigherPriorityTaskWoken
+                                  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>清单 106. <code>xQueueSendToBackFromISR()</code> API 函数原型</p>
+<p><code>xQueueSendFromISR()</code> 和 <code>xQueueSendToBackFromISR()</code> 在功能上是等效的。</p>
+<p>表38. <code>xQueueSendToFrontFromISR()</code> 和 <code>xQueueSendToBackFromISR()</code> 参数和返回值</p>
+<table>
+<thead>
+<tr>
+<th>参数名称/返回值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>xQueue</code></td>
+<td>要向其发送 (写入) 数据的队列的句柄。该队列句柄将从用于创建队列的 <code>xQueueCreate()</code> 调用中返回。</td>
+</tr>
+<tr>
+<td><code>pvItemToQueue</code></td>
+<td>指向将复制到队列中的数据的指针。<br>队列所能容纳的每个项目的大小是在创建队列时设置的，因此这许多字节将从 <code>pvItemToQueue</code> 复制到队列存储区域。</td>
+</tr>
+<tr>
+<td><code>pxHigherPriorityTaskWoken</code></td>
+<td>单个队列上有可能会有一个或多个任务被阻塞，等待数据变为可用。调用 <code>xQueueSendToFrontFromISR()</code> 或 <code>xQueueSendToBackFromISR()</code> 可以使数据可用，从而导致这样一个任务离开阻塞状态。如果调用 API 函数导致一个任务离开阻塞状态，并且解除阻塞的任务的优先级高于当前执行的任务（被中断的任务），则 API 函数在内部会将 <code>*pxHigherPriorityTaskWoken</code> 设置为 <code>pdTRUE</code>。<br>如果 <code>xQueueSendToFrontFromISR()</code> 或 <code>xQueueSendToBackFromISR()</code> 将此值设置为 <code>pdTRUE</code>，那么在中断退出之前应该进行上下文切换。这将确保中断直接返回到最高优先级的就绪状态任务。</td>
+</tr>
+<tr>
+<td>返回值</td>
+<td><p>有两个可能的返回值:<br>1. <code>pdPASS</code><br><code>pdPASS</code> 仅在数据被成功发送到队列时返回。<br>2. <code>errQUEUE_FULL</code><br>如果由于队列已满而无法将数据发送到队列，则返回 <code>errQUEUE_FULL</code>。</p></td>
+</tr>
+</tbody></table>
+<h3 id="从-ISR-中使用队列时的考虑因素"><a href="#从-ISR-中使用队列时的考虑因素" class="headerlink" title="从 ISR 中使用队列时的考虑因素"></a>从 ISR 中使用队列时的考虑因素</h3><p>队列提供了一种将数据从中断传递到任务的简单便捷的方法，但如果数据到达频率较高，则使用队列效率不高。</p>
+<p>FreeRTOS 下载中的许多演示程序都包含一个简单的 UART 驱动程序，该驱动程序使用队列将字符从 UART 的接收 ISR 中传递出来。在这些演示程序中，使用队列有两个原因：演示从 ISR 使用的队列，以及故意加载系统以测试 FreeRTOS 移植。以这种方式使用队列的 ISR 绝对不是为了代表高效的设计，除非数据到达速度放慢，否则建议生产代码不要复制该技术。适用于生产环境代码的更高效的技术包括 :</p>
+<ul>
+<li><p>使用直接内存访问（DMA）硬件来接收和缓冲字符。这种方法实际上没有软件开销。然后可以使用直接到任务的通知 [1] 来解除对仅在检测到传输中断后才处理缓冲区的任务的阻塞。</p>
+<blockquote>
+<p>[1] 直接到任务的通知提供了从 ISR 取消阻塞任务的最有效方法。第9章 任务通知 中介绍了直接到任务的通知。</p>
+</blockquote>
+</li>
+<li><p>将收到的每个字符复制到线程安全的 RAM 缓冲区 [2]。同样，直接任务通知可用于在收到完整消息后或在检测到传输中断后解除对将要处理缓冲区的任务的阻塞。</p>
+<blockquote>
+<p>[2] 作为 FreeRTOS + TCP (<a target="_blank" rel="noopener" href="http://www.freertos.org/tcp">http://www.FreeRTOS.org/tcp</a>) 的一部分提供的 “Stream Buffer ( 流缓冲区 )” 可以用于此目的。</p>
+</blockquote>
+</li>
+<li><p>直接在 ISR 中处理收到的字符，然后使用队列将数据处理的结果 ( 而不是原始数据 ) 发送到一个任务。图 34 先前已对此进行了演示。</p>
+</li>
+</ul>
+<h3 id="示例-19-在一个队列中从一个中断中发送和接收信息"><a href="#示例-19-在一个队列中从一个中断中发送和接收信息" class="headerlink" title="示例 19. 在一个队列中从一个中断中发送和接收信息"></a>示例 19. 在一个队列中从一个中断中发送和接收信息</h3><p>此示例演示在同一中断中使用的 <code>xQueueSendToBackFromISR()</code> 和 <code>xQueueReceiveFromISR()</code>  。如前所述，为方便起见，中断由软件产生。</p>
+<p>创建一个周期性任务，每200毫秒向一个队列发送五个数字。只有在所有五个数字都已发送后，它才会产生一个软件中断。任务实现如清单 107 所示。</p>
+<pre class=" language-c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">vIntegerGenerator</span><span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span>pvParameters<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    TickType_t xLastExecutionTime<span class="token punctuation">;</span>
+    uint32_t ulValueToSend <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> i<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">/* 初始化调用 vTaskDelayUntil() 所使用的变量。 */</span>
+    xLastExecutionTime <span class="token operator">=</span> <span class="token function">xTaskGetTickCount</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token punctuation">;</span><span class="token punctuation">;</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">/* 这是一个周期性任务。阻塞直到它再次运行的时间。任务将每 200ms 执行一次。 */</span>
+        <span class="token function">vTaskDelayUntil</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>xLastExecutionTime<span class="token punctuation">,</span> <span class="token function">pdMS_TO_TICKS</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">/* 向队列发送五个数字，每个数字比前一个数字高一。这些数字由中断服务例程从队列中读取。
+        中断服务例程总是清空队列，所以这个任务保证能够写入所有五个值，而不需要指定阻塞时间。 */</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">5</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token function">xQueueSendToBack</span><span class="token punctuation">(</span>xIntegerQueue<span class="token punctuation">,</span> <span class="token operator">&amp;</span>ulValueToSend<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            ulValueToSend<span class="token operator">++</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true">/* 生成中断，以便中断服务例程可以从队列中读取数值。
+        用于生成软件中断的语法取决于正在使用的 FreeRTOS 移植。
+        下面使用的语法只能用于 FreeRTOS Windows 移植，
+        在该移植中，这种中断只是模拟的。*/</span>
+        <span class="token function">vPrintString</span><span class="token punctuation">(</span><span class="token string">"Generator task - About to generate an interrupt.\r\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">vPortGenerateSimulatedInterrupt</span><span class="token punctuation">(</span>mainINTERRUPT_NUMBER<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">vPrintString</span><span class="token punctuation">(</span><span class="token string">"Generator task - Interrupt generated.\r\n\r\n\r\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>清单 107. 示例 19 中写入队列的任务的实现</p>
+<p>中断服务例程重复调用 <code>xQueueReceiveFromISR()</code> ，直到周期性任务写入队列的所有值都被读出，并且队列为空。每个收到的值的最后两位被用作一个字符串数组的索引。然后通过调用 <code>xQueueSendFromISR()</code> ，将指向相应索引位置处的字符串的指针发送到不同的队列。中断服务例程的实现如清单 108 所示。</p>
+<pre class=" language-c"><code class="language-c"><span class="token keyword">static</span> uint32_t <span class="token function">ulExampleInterruptHandler</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    BaseType_t xHigherPriorityTaskWoken<span class="token punctuation">;</span>
+    uint32_t ulReceivedNumber<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">/* 字符串被声明为静态常量，以确保它们不被分配到中断服务例程的堆栈上，
+    因此即使在中断服务例程不执行时也存在。 */</span>
+    <span class="token keyword">static</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>pcStrings<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span>
+        <span class="token punctuation">{</span>
+            <span class="token string">"String 0\r\n"</span><span class="token punctuation">,</span>
+            <span class="token string">"String 1\r\n"</span><span class="token punctuation">,</span>
+            <span class="token string">"String 2\r\n"</span><span class="token punctuation">,</span>
+            <span class="token string">"String 3\r\n"</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">/* 与往常一样，xHigherPriorityTaskWoken 被初始化为 pdFALSE，
+    以便能够检测到它在中断安全 API 函数中被设置为 pdTRUE。请注意，
+    由于中断安全API函数只能将 xHigherPriorityTaskWoken 设置为 pdTRUE，
+    因此在对 xQueueReceiveFromISR() 的调用和对 QueueSendToBackFromISR() 
+    的调用中使用同一个 xHigherPriorityTaskWoken 变量是安全的。 */</span>
+    xHigherPriorityTaskWoken <span class="token operator">=</span> pdFALSE<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">/* 从队列中读取，直到队列为空。 */</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token function">xQueueReceiveFromISR</span><span class="token punctuation">(</span>xIntegerQueue<span class="token punctuation">,</span>
+                                <span class="token operator">&amp;</span>ulReceivedNumber<span class="token punctuation">,</span>
+                                <span class="token operator">&amp;</span>xHigherPriorityTaskWoken<span class="token punctuation">)</span> <span class="token operator">!=</span> errQUEUE_EMPTY<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">/* 将接收到的值截断到最后两位 (包括值 0 到 3 )，
+        然后用截断的值作为 pcStrings[] 数组的索引，
+        选择一个字符串 (char *) 发送到另一个队列上。 */</span>
+        ulReceivedNumber <span class="token operator">&amp;</span><span class="token operator">=</span> <span class="token number">0x03</span><span class="token punctuation">;</span>
+        <span class="token function">xQueueSendToBackFromISR</span><span class="token punctuation">(</span>xStringQueue<span class="token punctuation">,</span>
+                                <span class="token operator">&amp;</span>pcStrings<span class="token punctuation">[</span>ulReceivedNumber<span class="token punctuation">]</span><span class="token punctuation">,</span>
+                                <span class="token operator">&amp;</span>xHigherPriorityTaskWoken<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">/* 如果从 xIntegerQueue 接收导致任务离开阻塞状态，
+    并且如果离开阻塞状态的任务的优先级高于处于运行状态的任务的优先级，
+    那么 xHigherPriorityTaskWoken 将在 xQueueReceiveFromISR() 中被设置为 pdTRUE。
+    
+    如果向 xStringQueue 发送导致任务离开阻塞状态，
+    并且如果离开阻塞状态的任务的优先级高于处于运行状态的任务的优先级，
+    那么 xHigherPriorityTaskWoken 将在 xQueueSendToBackFromISR() 中被设置为 pdTRUE。
+    
+    xHigherPriorityTaskWoken 被用作 portYIELD_FROM_ISR() 的参数。
+    如果 xHigherPriorityTaskWoken 等于 pdTRUE，
+    那么调用 portYIELD_FROM_ISR() 将请求进行上下文切换。
+    如果 xHigherPriorityTaskWoken 仍然是 pdFALSE，
+    那么调用 portYIELD_FROM_ISR() 将没有任何作用。
+    
+    Windows 移植使用的 portYIELD_FROM_ISR() 的实现包括一个 return 语句，
+    这就是为什么这个函数没有显式返回值的原因。 */</span>
+    <span class="token function">portYIELD_FROM_ISR</span><span class="token punctuation">(</span>xHigherPriorityTaskWoken<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>清单 108. 示例 19 所使用的中断服务例程的实现</p>
+<p>从中断服务例程接收字符指针的任务在队列上阻塞，直到有消息到达，，并在接收到每个字符串时打印出来。它的实现如清单 109 所示。</p>
+<pre class=" language-c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">vStringPrinter</span><span class="token punctuation">(</span> <span class="token keyword">void</span> <span class="token operator">*</span>pvParameters <span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">char</span> <span class="token operator">*</span>pcString<span class="token punctuation">;</span>
+    <span class="token keyword">for</span><span class="token punctuation">(</span> <span class="token punctuation">;</span><span class="token punctuation">;</span> <span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">/* 在队列上阻塞以等待数据到达 */</span>
+        <span class="token function">xQueueReceive</span><span class="token punctuation">(</span> xStringQueue<span class="token punctuation">,</span> <span class="token operator">&amp;</span>pcString<span class="token punctuation">,</span> portMAX_DELAY <span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">/* 打印出接收到的字符串。*/</span>
+        <span class="token function">vPrintString</span><span class="token punctuation">(</span> pcString <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> 
+<span class="token punctuation">}</span>
+</code></pre>
+<p>清单 109. 示例 19 中打印从中断服务例程接收到的字符串的任务</p>
+<p>像往常一样，<code>main()</code> 在启动调度程序之前创建所需的队列和任务。它的实现如清单 110 所示。</p>
+<pre class=" language-c"><code class="language-c"><span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span> <span class="token keyword">void</span> <span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+ <span class="token comment" spellcheck="true">/* 在使用队列之前，必须首先创建队列。创建本例所使用的两个队列。
+ 一个队列可以保存 uint32_t 类型的变量，另一个队列可以保存 char * 类型的变量。
+ 两个队列最多可以容纳10个项目。真实的应用程序应该检查返回值以确保队列已被成功创建。 */</span>
+ xIntegerQueue <span class="token operator">=</span> <span class="token function">xQueueCreate</span><span class="token punctuation">(</span> <span class="token number">10</span><span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span> uint32_t <span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+ xStringQueue <span class="token operator">=</span> <span class="token function">xQueueCreate</span><span class="token punctuation">(</span> <span class="token number">10</span><span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span> <span class="token keyword">char</span> <span class="token operator">*</span> <span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+ <span class="token comment" spellcheck="true">/* 创建使用队列将整数传递给中断服务例程的任务。任务以优先级 1 创建。 */</span>
+ <span class="token function">xTaskCreate</span><span class="token punctuation">(</span> vIntegerGenerator<span class="token punctuation">,</span> <span class="token string">"IntGen"</span><span class="token punctuation">,</span> <span class="token number">1000</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token constant">NULL</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+ <span class="token comment" spellcheck="true">/* 创建打印出中断服务例程发送给它的字符串的任务。此任务以较高的优先级 2 创建。 */</span>
+ <span class="token function">xTaskCreate</span><span class="token punctuation">(</span> vStringPrinter<span class="token punctuation">,</span> <span class="token string">"String"</span><span class="token punctuation">,</span> <span class="token number">1000</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token constant">NULL</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+ <span class="token comment" spellcheck="true">/* 安装软件中断的处理程序。这样做所需的语法取决于正在使用的 FreeRTOS 移植。
+ 这里显示的语法只能用于 FreeRTOS Windows 移植，在那里这种中断只是模拟的。 */</span>
+ <span class="token function">vPortSetInterruptHandler</span><span class="token punctuation">(</span> mainINTERRUPT_NUMBER<span class="token punctuation">,</span> ulExampleInterruptHandler <span class="token punctuation">)</span><span class="token punctuation">;</span>
+ <span class="token comment" spellcheck="true">/* 启动调度程序，使创建的任务开始执行。 */</span>
+ <span class="token function">vTaskStartScheduler</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+ <span class="token comment" spellcheck="true">/* 如果一切顺利，那么main()将永远不会到达这里，因为调度程序现在将运行任务
+ 如果 main() 确实到达这里，那么很可能是没有足够的堆内存可用于创建空闲任务。
+ 第 2 章提供了有关堆内存管理的更多信息。 */</span>
+ <span class="token keyword">for</span><span class="token punctuation">(</span> <span class="token punctuation">;</span><span class="token punctuation">;</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>清单 110. 示例 19 的 <code>main()</code> 函数</p>
+<p>执行示例 19 时产生的输出如图 59 所示。可以看出，中断接收了所有五个整数，并产生了五个字符串作为响应。图 60 中给出了更多的解释。</p>
+<p><img src="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/image-20240411070715950.png" alt="图 59. 执行示例 19 时产生的输出"></p>
+<p><img src="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/image-20240411071042631.png" alt="图 60. 示例 19 产生的执行顺序"></p>
+<h2 id="中断嵌套"><a href="#中断嵌套" class="headerlink" title="中断嵌套"></a>中断嵌套</h2><p>在任务优先级和中断优先级之间出现混淆是很常见的。本节讨论中断优先级，本节讨论中断优先级，即中断服务例程 ( ISR ) 相对于彼此执行的优先级。分配给任务的优先级与分配给中断的优先级没有任何关系。硬件决定 ISR 何时执行，而软件决定任务何时执行。响应硬件中断而执行的 ISR 将中断任务，但任务不能抢占 ISR。</p>
+<p>支持中断嵌套的移植需要在 <code>FreeRTOSConfig.h</code> 中定义表 39 中详述的一个或两个常量。 <code>configMAX_SYSCALL_INTERRUPT_PRIORITY</code> 和 <code>configMAX_API_CALL_INTERRUPT_PRIORITY</code> 都定义相同的属性。较旧的 FreeRTOS 移植使用 <code>configMAX_SYSCALL_INTERRUPT_PRIORITY</code>，较新的 FreeRTOS 移植使用 <code>configMAX_API_CALL_INTERRUPT_PRIORITY</code>。</p>
+<p>表 39. 控制中断嵌套的常量</p>
+<table>
+<thead>
+<tr>
+<th>恒定</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>configMAX_SYSCALL_INTERRUPT_PRIORITY</code> or <code>configMAX_API_CALL_INTERRUPT_PRIORITY</code></td>
+<td>设置可以调用中断安全 FreeRTOS API 函数的最高中断优先级。</td>
+</tr>
+<tr>
+<td><code>configKERNEL_INTERRUPT_PRIORITY</code></td>
+<td>设置滴答 ( tick ) 中断使用的中断优先级，并且必须始终设置为尽可能低的中断优先级。<br>如果使用的FreeRTOS移植没有同时使用<code>configMAX_SYSCALL_INTERRUPT_PRIORITY</code> 常量，那么任何使用中断安全的FreeRTOS API 函数的中断也必须以 <code>configKERNEL_INTERRUPT_PRIORITY</code> 定义的优先级执行。</td>
+</tr>
+</tbody></table>
+<p>每个中断源都有一个数字优先级和一个逻辑优先级 : </p>
+<ul>
+<li><p>数字优先级</p>
+<p>数字优先级只是分配给中断优先级的数字。例如，如果一个中断被分配的优先级为7，那么它的数字优先级就是 7。 同样，如果一个中断被分配的优先级为 200，那么它的数字优先级就是 200。</p>
+</li>
+<li><p>逻辑优先级</p>
+<p>一个中断的逻辑优先级描述了该中断相对于其他中断的优先级。</p>
+<p>如果两个不同优先级的中断同时发生，则处理器将先执行两个中断中逻辑优先级较高的一个中断，然后再执行两个中断中逻辑优先级较低的一个中断。</p>
+<p>一个中断可以中断 ( 嵌套 ) 任何具有较低逻辑优先级的中断，但一个中断不能中断 ( 嵌套 ) 任何具有相同或更高逻辑优先级的中断。</p>
+</li>
+</ul>
+<p>中断的数字优先级和逻辑优先级之间的关系取决于处理器架构；在某些处理器上，分配给一个中断的数字优先级越高，该中断的逻辑优先级就越高，而在其他处理器架构上，分配给一个中断的数字优先级越高，该中断的逻辑优先级就越低。</p>
+<p>通过将 <code>configMAX_SYSCALL_INTERRUPT_PRIORITY</code> 设置为比 <code>configKERNEL_INTERRUPT_PRIORITY</code> 更高的逻辑中断优先级可以创建一个完整的中断嵌套模型。图 61 对此进行了演示，其中显示了以下场景：</p>
+<ul>
+<li>处理器具有 7 个唯一的中断优先级。</li>
+<li>分配数字优先级 7 的中断比分配数字优先级 1 的中断具有更高的逻辑优先级。</li>
+<li><code>configKERNEL_INTERRUPT_PRIORITY</code> 被设置为 1 。</li>
+<li><code>configMAX_SYSCALL_INTERRUPT_PRIORITY</code> 被设置为 3 。</li>
+</ul>
+<p><img src="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/image-20240411085426838.png" alt="图 61. 影响中断嵌套行为的常量"></p>
+<p>参考图 61：</p>
+<ul>
+<li>当内核或应用程序位于临界段时，使用优先级 1 到 3 ( 含 ) 的中断将被阻止执行。以这些优先级运行的 ISR 可以使用中断安全的 FreeRTOS API 函数。临界段的描述见第 7 章。</li>
+<li>使用优先级 4 或更高优先级的中断不受临界段的影响，因此调度程序所做的任何操作都不会阻止这些中断立即执行——在硬件本身的限制范围内。以这些优先级执行的 ISR 无法使用任何 FreeRTOS API 函数。</li>
+<li>通常，需要非常严格的时间精度的功能 ( 例如电机控制 ) 会使用高于 <code>configMAX_SYSCALL_INTERRUPT_PRIORITY</code> 的优先级，以确保调度器不会在中断响应时间中引入抖动。</li>
+</ul>
+<h3 id="对ARM-Cortex-M-和ARM-GIC用户的说明"><a href="#对ARM-Cortex-M-和ARM-GIC用户的说明" class="headerlink" title="对ARM Cortex-M 和ARM GIC用户的说明"></a>对ARM Cortex-M 和ARM GIC用户的说明</h3><p><code>Cortex-M</code> 处理器上的中断配置很混乱，并且容易出错。为了协助您的开发，<code>FreeRTOS Cortex-M</code> 移植会自动检查中断配置，但前提是定义了 <code>configASSERT()</code> 。<code>configASSERT()</code> 在 11.2 节中描述。</p>
+<blockquote>
+<p>Cortex-M：本节仅部分适用于 <code>Cortex-M0</code> 和 <code>Cortex-M0+</code> 内核。</p>
+</blockquote>
+<p>ARM Cortex 内核和 ARM 通用中断控制器 (GIC — Generic Interrupt Controller ) 使用数字上的低优先级数字来表示逻辑上的高优先级中断。这似乎违反直觉，并且很容易忘记。如果您希望为中断分配逻辑上较低的优先级，则必须为其分配较高的数字值。如果您希望为中断分配逻辑上较高的优先级，则必须为其分配较低的数字值。</p>
+<p><code>Cortex-M</code> 中断控制器允许使用最多 8 位来指定每个中断优先级，使 255 成为可能的最低优先级。0 是最高优先级。然而，<code>Cortex-M</code> 微控制器通常仅实现 8 个可能位的子集。实际实现的位数取决于微控制器系列。</p>
+<p>当仅实现了 8 个可能位的子集时，只能使用字节的最高有效位，而最低有效位则未实现。未实现的位可以取任何值，但通常将它们设置为  1 。 图 62 对此进行了演示，该图显示了二进制 101 的优先级如何存储在一个实现了 4 个优先位的<code>Cortex-M</code>微控制器中。</p>
+<p><img src="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/image-20240411174725336.png" alt="图 62. 实现 4 个优先级位的 Cortex-M 微控制器如何存储二进制 101 的优先级"></p>
+<p>在图 62 中，二进制值 101 已移至最高有效四位，因为未实现最低有效四位。 未实现的位已设置为 1。</p>
+<p>某些库函数期望在将优先级值向上移至已实现的 ( 最高有效 ) 位之后指定优先级值。在使用这样的函数时，可以将图 62 所示的优先级指定为十进制 95 ( 0101 1111 ) 。十进制 95 将二进制 101 上移 4 以生成二进制 101nnnn ( 其中 ‘ n ‘ 是一个未实现的位 )，将未实现的位设置为 1 以生成二进制 1011111 。</p>
+<p>某些库函数期望在将优先级值向上移至已实现的 ( 最高有效 ) 位之前指定优先级值。使用此类函数时，图 62 中所示的优先级必须指定为十进制 5。十进制 5 是没有任何移位的二进制 101。</p>
+<blockquote>
+<p>也就是说在使用函数写入优先级寄存器时，要设置的优先级通常作为函数参数传入，有些函数要求你传入的参数要提前将优先级移至对应的有效位，函数直接将参数写入寄存器；有些函数可以直接将要设置的优先级作为参数传入，函数会帮你在内部将参数做好移位后再写入寄存器。</p>
+</blockquote>
+<p><code>configMAX_SYSCALL_INTERRUPT_PRIORITY</code> 和 <code>configKERNEL_INTERRUPT_PRIORITY</code> 必须以允许它们直接写入 <code>Cortex-M</code> 寄存器的方式来指定，所以在优先级值被上移到实现的位后。</p>
+<p><code>configKERNEL_INTERRUPT_PRIORITY</code> 必须始终设置为可能的最低中断优先级。 未实现的优先级位可以设置为1，因此无论实际实现了多少优先级位，该常量始终可以设置为 255。</p>
+<p><code>Cortex-M</code>中断的默认优先级为 0 —— 可能的最高优先级。<code>Cortex-M</code> 硬件的实现不允许 <code>configMAX_SYSCALL_INTERRUPT_PRIORITY</code> 被设置为 0 ，所以使用 FreeRTOS API 的中断的优先级绝不能保留为其默认值。</p>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/Blogs/about" rel="external nofollow noreferrer">Koito Yuu</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://koito-yuu153.github.io/Blogs/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/">https://koito-yuu153.github.io/Blogs/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/Blogs/about" target="_blank">Koito Yuu</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            <span class="chip bg-color">无标签</span>
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/Blogs/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/Blogs/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/Blogs/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/Blogs/medias/reward/wechat.jpg" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/Blogs/2024/03/21/chapter-3-ren-wu-guan-li/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/Blogs/medias/featureimages/21.jpg" class="responsive-img" alt="Chapter 3 任务管理">
+                        
+                        <span class="card-title">Chapter 3 任务管理</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2024-03-21
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/Blogs/categories/FreeRTOS/" class="post-category">
+                                    FreeRTOS
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/Blogs/2024/03/21/hexo-de-shi-yong-jiao-cheng/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/Blogs/medias/featureimages/3.jpg" class="responsive-img" alt="hexo的使用教程">
+                        
+                        <span class="card-title">hexo的使用教程</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-03-21
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            Koito Yuu
+                            
+                        </span>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/Blogs/libs/codeBlock/codeBlockFuction.js"></script>
+
+
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/Blogs/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/Blogs/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/Blogs/libs/codeBlock/codeShrink.js"></script>
+
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/Blogs/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/Blogs/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="9479612817"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/Blogs/libs/aplayer/APlayer.min.js"></script>
+<script src="/Blogs/libs/aplayer/Meting.min.js"></script>
+
+    
+
+    <div class="container row center-align"
+         style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2024</span>
+            
+            <a href="/Blogs/about" target="_blank">Koito Yuu</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            
+            <br>
+            
+            
+            
+                
+            
+            
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
+            </span>
+            
+            
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
+            </span>
+            
+            <br>
+
+            <!-- 运行天数提醒. -->
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/Koito-Yuu153" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:1181062873@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=2810880357" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 2810880357" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/Blogs/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 白天和黑夜主题 -->
+<div class="stars-con">
+    <div id="stars"></div>
+    <div id="stars2"></div>
+    <div id="stars3"></div>  
+</div>
+
+<script>
+    function switchNightMode() {
+        $('<div class="Cuteen_DarkSky"><div class="Cuteen_DarkPlanet"></div></div>').appendTo($('body')),
+        setTimeout(function () {
+            $('body').hasClass('DarkMode') 
+            ? ($('body').removeClass('DarkMode'), localStorage.setItem('isDark', '0'), $('#sum-moon-icon').removeClass("fa-sun").addClass('fa-moon')) 
+            : ($('body').addClass('DarkMode'), localStorage.setItem('isDark', '1'), $('#sum-moon-icon').addClass("fa-sun").removeClass('fa-moon')),
+            
+            setTimeout(function () {
+            $('.Cuteen_DarkSky').fadeOut(1e3, function () {
+                $(this).remove()
+            })
+            }, 2e3)
+        })
+    }
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/Blogs/libs/materialize/materialize.min.js"></script>
+    <script src="/Blogs/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/Blogs/libs/aos/aos.js"></script>
+    <script src="/Blogs/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/Blogs/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/Blogs/js/matery.js"></script>
+
+    
+
+    
+    
+    
+
+    <!-- 雪花特效 -->
+    
+
+    <!-- 鼠标星星特效 -->
+    
+
+     
+        <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script>
+        <script src="/Blogs/libs/others/TencentCaptcha.js"></script>
+        <button id="TencentCaptcha" data-appid="xxxxxxxxxx" data-cbfn="callback" type="button" hidden></button>
+    
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/Blogs/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/Blogs/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/Blogs/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
