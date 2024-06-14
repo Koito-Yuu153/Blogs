@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="keywords" content="Chapter 6 中断管理, Koito Yuu&#39;s Blogs">
-    <meta name="description" content="中断管理章节介绍和范围事件嵌入式实时系统必须对源自环境的事件做出响应。例如，到达以太网外设的数据包（事件）可能需要传递到 TCP/IP 栈进行处理（操作）。非平凡的系统必须服务于来自多个源的事件，所有这些源都有不同的处理开销和响应时间要求。">
+    <meta name="description" content="Chapter 6 中断管理章节介绍和范围事件嵌入式实时系统必须对源自环境的事件做出响应。例如，到达以太网外设的数据包（事件）可能需要传递到 TCP/IP 栈进行处理（操作）。非平凡的系统必须服务于来自多个源的事件，所有这些源都有不同的处理">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -416,7 +416,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="中断管理"><a href="#中断管理" class="headerlink" title="中断管理"></a>中断管理</h1><h2 id="章节介绍和范围"><a href="#章节介绍和范围" class="headerlink" title="章节介绍和范围"></a>章节介绍和范围</h2><h3 id="事件"><a href="#事件" class="headerlink" title="事件"></a>事件</h3><p>嵌入式实时系统必须对源自环境的事件做出响应。例如，到达以太网外设的数据包（事件）可能需要传递到 TCP/IP 栈进行处理（操作）。非平凡的系统必须服务于来自多个源的事件，所有这些源都有不同的处理开销和响应时间要求。在每种情况下，都必须对最佳事件处理实施策略作出判断：</p>
+                <h1 id="Chapter-6-中断管理"><a href="#Chapter-6-中断管理" class="headerlink" title="Chapter 6 中断管理"></a>Chapter 6 中断管理</h1><h2 id="章节介绍和范围"><a href="#章节介绍和范围" class="headerlink" title="章节介绍和范围"></a>章节介绍和范围</h2><h3 id="事件"><a href="#事件" class="headerlink" title="事件"></a>事件</h3><p>嵌入式实时系统必须对源自环境的事件做出响应。例如，到达以太网外设的数据包（事件）可能需要传递到 TCP/IP 栈进行处理（操作）。非平凡的系统必须服务于来自多个源的事件，所有这些源都有不同的处理开销和响应时间要求。在每种情况下，都必须对最佳事件处理实施策略作出判断：</p>
 <ol>
 <li>如何检测事件？通常使用中断，但也可以轮询输入。</li>
 <li>当使用中断时，应在中断服务例程 (ISR) 内部执行多少处理，在外部执行多少处理？通常希望每个 ISR 尽可能短。</li>
@@ -1381,47 +1381,6 @@ xCountingSemaphore <span class="token operator">=</span> <span class="token func
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/Blogs/2024/03/21/chapter-5-ruan-jian-ding-shi-qi-guan-li/">
-                    <div class="card-image">
-                        
-                        
-                        <img src="/Blogs/medias/featureimages/12.jpg" class="responsive-img" alt="Chapter 5 软件定时器管理">
-                        
-                        <span class="card-title">Chapter 5 软件定时器管理</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            
-                        
-                    </div>
-                    <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2024-03-21
-                        </span>
-                        <span class="publish-author">
-                            
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/Blogs/categories/FreeRTOS/" class="post-category">
-                                    FreeRTOS
-                                </a>
-                            
-                            
-                        </span>
-                    </div>
-                </div>
-                
-            </div>
-        </div>
-        
-        
-        <div class="article col s12 m6" data-aos="fade-up">
-            <div class="article-badge right-badge text-color">
-                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
-            </div>
-            <div class="card">
                 <a href="/Blogs/2024/03/21/hexo-de-shi-yong-jiao-cheng/">
                     <div class="card-image">
                         
@@ -1438,9 +1397,9 @@ xCountingSemaphore <span class="token operator">=</span> <span class="token func
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2024-03-21
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2024-03-21
+                        </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-user fa-fw"></i>
@@ -1449,6 +1408,48 @@ xCountingSemaphore <span class="token operator">=</span> <span class="token func
                         </span>
                     </div>
                 </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                本篇&nbsp;<i class="far fa-dot-circle"></i>
+            </div>
+            <div class="card">
+                <a href="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/Blogs/medias/featureimages/22.jpg" class="responsive-img" alt="Chapter 6 中断管理">
+                        
+                        <span class="card-title">Chapter 6 中断管理</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-03-21
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/Blogs/categories/FreeRTOS/" class="post-category">
+                                    FreeRTOS
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+
                 
             </div>
         </div>
