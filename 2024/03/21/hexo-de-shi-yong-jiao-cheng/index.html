@@ -403,9 +403,6 @@
         <hr class="clearfix">
 
         
-        <!-- 是否加载使用自带的 prismjs. -->
-        <link rel="stylesheet" href="/Blogs/libs/prism/prism.min.css">
-        
 
         
 
@@ -416,20 +413,20 @@
 <h2 id="Hexo-搭建"><a href="#Hexo-搭建" class="headerlink" title="Hexo 搭建"></a>Hexo 搭建</h2><h3 id="1-安装Git"><a href="#1-安装Git" class="headerlink" title="1. 安装Git"></a>1. 安装Git</h3><p>为了把本地的网页文件上传到github上面去，需要用到工具———Git[下载地址]。Git是目前世界上最先进的分布式版本控制系统，可以有效、高速的处理从很小到非常大的项目版本管理。Git非常强大，建议每个人都去了解一下。廖雪峰老师的Git教程写的非常好，大家可以看一下。Git教程</p>
 <p><strong>windows：</strong>到git官网上下载.exe文件，<a target="_blank" rel="noopener" href="https://git-scm.com/download/win">Download git</a>，对于中国大陆地区用户，可以前往 <a target="_blank" rel="noopener" href="https://npmmirror.com/mirrors/git-for-windows/">淘宝 Git for Windows 镜像</a> 下载 git 安装包。安装选项还是全部默认，只不过最后一步添加路径时选择 Use Git from the Windows Command Prompt ，这样我们就可以直接在命令提示符里打开git了。</p>
 <p><strong>linux：</strong>对 <code>linux</code> 来说实在是太简单了，只需要一行代码</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install git</span><br></pre></td></tr></tbody></table></figure>
-
-
-
+<pre><code>sudo apt-get install git
+</code></pre>
 <h3 id="2-安装nodejs"><a href="#2-安装nodejs" class="headerlink" title="2. 安装nodejs"></a>2. 安装nodejs</h3><p>Hexo是基于node.js编写的，所以需要安装一下node.js和里面的npm工具。</p>
 <p><strong>windows：</strong>下载稳定版或者最新版都可以Node.js，安装选项全部默认，一路点击Next。<br>最后安装好之后，按Win+R打开命令提示符，输入node -v和npm -v，如果出现版本号，那么就安装成功了。</p>
 <p><strong>linux：</strong>命令行安装：</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install nodejs</span><br><span class="line">sudo apt-get install npm</span><br></pre></td></tr></tbody></table></figure>
-
+<pre><code>sudo apt-get install nodejs
+sudo apt-get install npm
+</code></pre>
 <p>不过不推荐命令行安装，有时候有问题，建议直接到<a target="_blank" rel="noopener" href="http://nodejs.cn/">nodejs官网</a>去下载，如下所示：</p>
 <p><img src="/Blogs/./hexo%E7%9A%84%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/Nodejs_download.png"></p>
 <p>安装完后，打开命令行终端，输入：</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">node -v</span><br><span class="line">npm -v</span><br></pre></td></tr></tbody></table></figure>
-
+<pre><code>node -v
+npm -v
+</code></pre>
 <p>检查一下有没有安装成功，出现版本号就是成功了。</p>
 <h3 id="3-安装Hexo"><a href="#3-安装Hexo" class="headerlink" title="3. 安装Hexo"></a>3. 安装Hexo</h3><p>前面<code>git</code>和<code>nodejs</code>安装好后，就可以使用 <code>npm</code> 安装<code>hexo</code>了。</p>
 <blockquote>
@@ -443,8 +440,8 @@
 </blockquote>
 <p>右键点击<code>Git Bash Here</code>，打开<code>git</code>的控制台窗口，以后我们所有的操作都在<code>git</code>控制台进行，就不用<code>Windows</code>自带的<code>cmd</code>了(要用也能用)。</p>
 <p>输入<code>npm install -g hexo-cli</code>安装 <code>Hexo</code>。可能会有几个报错，无视它就行。</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g hexo-cli</span><br></pre></td></tr></tbody></table></figure>
-
+<pre><code>npm install -g hexo-cli
+</code></pre>
 <p>安装完后输入 <code>hexo -v</code> 验证是否安装成功。</p>
 <p>至此 <code>hexo</code> 就安装完了。</p>
 <blockquote>
@@ -453,8 +450,8 @@
 <p>上面的 hexo-cli 包就是全局安装，全局安装可以一个包多个项目共用，但不同的项目可能对包的版本要求各有不同，容易发生冲突，结合实际情况选择全局安装还是局部安装。</p>
 </blockquote>
 <h3 id="4-初始化-hexo"><a href="#4-初始化-hexo" class="headerlink" title="4. 初始化 hexo"></a>4. 初始化 hexo</h3><p>接下来初始化一下 <code>hexo</code> ，即初始化我们的网站，输入 <code>hexo init</code> 初始化文件夹</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo init &lt;folder&gt;</span><br></pre></td></tr></tbody></table></figure>
-
+<pre><code>hexo init &lt;folder&gt;
+</code></pre>
 <p><code>folder</code> 指定一个文件夹(若该文件夹不存在，则创建自动该文件夹)，在该文件夹下新建所需要的文件。如果没有指定这个参数，将直接在当前路径下新建所需文件。</p>
 <p>接着进入新建了所需文件的路径，输入 <code>npm install</code> ，根据运行 <code>hexo init</code> 新建的文件中的配置安装必备的组件。</p>
 <blockquote>
@@ -481,14 +478,9 @@
 <li><code>package.json:</code> 应用程序的信息。<a target="_blank" rel="noopener" href="https://ejs.co/">EJS</a>, <a target="_blank" rel="noopener" href="http://learnboost.github.io/stylus/">Stylus</a> 和 <a target="_blank" rel="noopener" href="http://daringfireball.net/projects/markdown/">Markdown</a> 渲染引擎 已默认安装，可以自由移除</li>
 </ul>
 <p>这样本地的最简单的网站配置就弄好了，输入<code>hexo g</code> 生成静态网页，然后输入<code>hexo s</code> 打开本地服务器：</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo g</span><br><span class="line">hexo server(或者简写:hexo s）)</span><br></pre></td></tr></tbody></table></figure>
-
-
-
-
-
-
-
+<pre><code>hexo g
+hexo server(或者简写:hexo s）)
+</code></pre>
 <h2 id="配置-hexo-的-config-yml"><a href="#配置-hexo-的-config-yml" class="headerlink" title="配置  hexo 的 _config.yml"></a>配置  hexo 的 _config.yml</h2><p>官方的文档更详细—-&gt;<a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/configuration">配置</a> ，强烈建议忘记相关内容时优先看官方文档，在这里只选出部分内容配合图片进行说明。</p>
 <h3 id="网站"><a href="#网站" class="headerlink" title="网站"></a>网站</h3><table>
 <thead>
@@ -533,12 +525,29 @@
 <h2 id="细碎的网页配置记录"><a href="#细碎的网页配置记录" class="headerlink" title="细碎的网页配置记录"></a>细碎的网页配置记录</h2><h3 id="首页轮播"><a href="#首页轮播" class="headerlink" title="首页轮播"></a>首页轮播</h3><p>首先想要看到轮播效果必须先把文章加入轮播里，首页图片和文章图片组成了轮播，如果不把文章加入轮播里就算开启了轮播也没有办法看到轮播效果。怎么加入readme文件中有文章Front-matter的介绍(建议ctrl+f搜索关键字)，也就是新建文章需要有哪些配置</p>
 <h3 id="首页背景颜色"><a href="#首页背景颜色" class="headerlink" title="首页背景颜色"></a>首页背景颜色</h3><p>更改颜色主题文件夹下的source/css/matery.css的606-696行， 背景颜色可以要可以不要，看你选择的轮播图片了。如果轮播图片颜色较浅就要加，因为不加的话上面的文字会看不清楚，颜色也可以更改。不过没有找到好的配色的话还是不要乱改变了，会很丑</p>
 <h3 id="导航栏背景颜色"><a href="#导航栏背景颜色" class="headerlink" title="导航栏背景颜色"></a>导航栏背景颜色</h3><p>也是matery.css中找到.bg-cover修改，我用的是</p>
-<figure class="highlight css"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.bg-color</span> {</span><br><span class="line"> <span class="attribute">background-image</span>: <span class="built_in">linear-gradient</span>(to right, <span class="number">#7371BC</span> <span class="number">0%</span>, <span class="number">#284D95</span> <span class="number">100%</span>);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
+<pre class=" language-css"><code class="language-css">   <span class="token selector"><span class="token class">.bg-color</span> </span><span class="token punctuation">{</span>
+    <span class="token property">background-image</span><span class="token punctuation">:</span> <span class="token function">linear-gradient</span><span class="token punctuation">(</span>to right, <span class="token hexcode">#7371BC</span> <span class="token number">0%</span>, <span class="token hexcode">#284D95</span> <span class="token number">100%</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token punctuation">}</span>
+</code></pre>
 <p>改了你想用的颜色之后其他的图标、hover等等的颜色也要与导航栏相匹配才好看，怎么找其他的呢？告诉你一个比较笨又比较方便的一个办法。在matery.css中从头到尾找与刚才.bg-cover中相近的颜色(一般编辑器中都会显示颜色)全部改为你想要的颜色，轮播图片中按钮颜色找.cover-btns。具体配色看个人喜好了</p>
 <h3 id="新建文章的模板修改"><a href="#新建文章的模板修改" class="headerlink" title="新建文章的模板修改"></a>新建文章的模板修改</h3><p>首先为了新建文章方便，我们可以修改一下文章模板，可以将<code>/scaffolds/post.md</code>修改为如下代码：</p>
-<figure class="highlight markdown"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">title: {{ title }}</span><br><span class="line">date: {{ date }}</span><br><span class="line">author: </span><br><span class="line">img: </span><br><span class="line">coverImg: </span><br><span class="line">top: false</span><br><span class="line">cover: false</span><br><span class="line">toc: true</span><br><span class="line">mathjax: false</span><br><span class="line">password:</span><br><span class="line">summary:</span><br><span class="line">keywords:</span><br><span class="line">tags:</span><br><span class="line"><span class="section">categories:</span></span><br><span class="line"><span class="section">---</span></span><br></pre></td></tr></tbody></table></figure>
-
+<pre class=" language-markdown"><code class="language-markdown"><span class="token hr punctuation">---</span>
+title: {{ title }}
+date: {{ date }}
+author: 
+img: 
+coverImg: 
+top: false
+cover: false
+toc: true
+mathjax: false
+password:
+summary:
+keywords:
+tags:
+<span class="token title important">categories:
+<span class="token punctuation">---</span></span>
+</code></pre>
 <p>这样新建文章后 一些<code>Front-matter</code>参数不用你自己补充了，hexo会自动将这些内容复制到新建的博客中，修改对应信息就可以了。</p>
 <h3 id="matery主题的背景图遮罩颜色"><a href="#matery主题的背景图遮罩颜色" class="headerlink" title="matery主题的背景图遮罩颜色"></a>matery主题的背景图遮罩颜色</h3><h3 id="在博客中使用本地图片"><a href="#在博客中使用本地图片" class="headerlink" title="在博客中使用本地图片"></a>在博客中使用本地图片</h3><p>对应官方文档的 <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/asset-folders">资源文件夹</a> 章节</p>
 <p>想要更有规律地提供图片和其他资源以及想要将资源分布在各个文章上时，可以将 hexo 的 <code>config.yml</code> 文件中的 <code>post_asset_folder</code> 选项设为 <code>true</code> 。</p>
@@ -549,10 +558,12 @@
 <p><img src="/Blogs/hexo%E7%9A%84%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/image-20240322032521818.png" alt="图片不能正常显示"></p>
 <h4 id="使用标签插件"><a href="#使用标签插件" class="headerlink" title="使用标签插件"></a>使用标签插件</h4><p>要想让 md 文件中引用的本地图片在网页上正常显示，可以使用 hexo 提供的功能。</p>
 <p>以上面图片中新建的 111.md 为例，把一个 <code>example.jpg</code> 图片放在了对应 111 文件夹中，如果通过使用相对路径的常规 markdown 语法 <code>![](./111/example.jpg)</code> ，图片不会出现在网页上。要想在网页上正确显示图片，应该使用 hexo 插件提供的功能：</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">{% asset_path slug %}</span><br><span class="line">{% asset_img slug [title] %}</span><br><span class="line">{% asset_link slug [title] %}</span><br></pre></td></tr></tbody></table></figure>
-
-<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">{% asset_img example.jpg This is an example image %}</span><br></pre></td></tr></tbody></table></figure>
-
+<pre><code>{% asset_path slug %}
+{% asset_img slug [title] %}
+{% asset_link slug [title] %}
+</code></pre>
+<pre><code>{% asset_img example.jpg This is an example image %}
+</code></pre>
 <p>图片正常显示：</p>
 <img src="123.jpg" alt="image-20240322040752173" style="zoom:50%;">
 
@@ -577,6 +588,7 @@
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">hexo 官方中文文档</a></p>
 <p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_58608526/article/details/124652412">Hexo+Github博客搭建教程</a></p>
 <p><a target="_blank" rel="noopener" href="https://blog.csdn.net/kuashijidexibao/article/details/112971657">Hexo-Matery主题细致美化</a></p>
+<p><a target="_blank" rel="noopener" href="https://x-hao.github.io/2021/04/22/hexo-matery-da-jian-ge-ren-bo-ke-cai-keng-ji-lu/">hexo+matery搭建个人博客踩坑记录</a></p>
 
                 
             </div>
@@ -717,17 +729,18 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
-                <a href="/Blogs/2024/06/14/chapter-3-ren-wu-guan-li/">
+                <a href="/Blogs/2024/03/21/hexo-de-shi-yong-jiao-cheng/">
                     <div class="card-image">
                         
                         
-                        <img src="/Blogs/medias/featureimages/21.jpg" class="responsive-img" alt="Chapter 3 任务管理">
+                        <img src="/Blogs/medias/featureimages/3.jpg" class="responsive-img" alt="hexo的使用教程">
                         
-                        <span class="card-title">Chapter 3 任务管理</span>
+                        <span class="card-title">hexo的使用教程</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -737,9 +750,9 @@
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2024-06-14
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-03-21
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-user fa-fw"></i>
@@ -748,6 +761,7 @@
                         </span>
                     </div>
                 </div>
+
                 
             </div>
         </div>
@@ -800,9 +814,6 @@
 <!-- 代码块功能依赖 -->
 <script type="text/javascript" src="/Blogs/libs/codeBlock/codeBlockFuction.js"></script>
 
-
-  <!-- 是否加载使用自带的 prismjs. -->
-  <script type="text/javascript" src="/Blogs/libs/prism/prism.min.js"></script>
 
 
 <!-- 代码语言 -->
