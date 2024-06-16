@@ -395,7 +395,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2024-03-21
+                    2024-06-15
                 </div>
                 
 
@@ -521,7 +521,7 @@
 <p>中断服务程序必须记录中断的原因，并清除中断。 中断所需的任何其他处理通常可以在任务中执行，从而允许中断服务程序尽可能快地退出。这称为 <code>"延迟中断处理"</code>，因为中断所需的处理被从 ISR “延迟” 到任务。</p>
 <p>将中断处理延迟到任务还允许应用程序编写者相对于应用程序中的其他任务确定处理的优先级，并使用所有 FreeRTOS API 函数。</p>
 <p>如果中断处理延迟到的任务的优先级高于任何其他任务的优先级，则处理将立即执行，就像在 ISR 本身中执行处理一样。 这种情况如图 48 所示，其中任务 1 是一个正常的应用程序任务，任务 2 是中断处理被延迟到的任务。</p>
-<p><img src="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/image-20240401105637107.png" alt="图 48 在高优先级任务中完成中断处理"></p>
+<p><img src="/Blogs/2024/06/15/chapter-6-zhong-duan-guan-li/image-20240401105637107.png" alt="图 48 在高优先级任务中完成中断处理"></p>
 <p>在图 48 中，中断处理从 t2 时刻开始，实际上在 t4 时刻有效地结束，但只有 t2 和 t3 时刻之间的时间段用于 ISR。 如果未使用延迟中断处理，则时间 t2 和 t4 之间的整个时间段都将花费在 ISR 中。</p>
 <p>对于何时最好执行 ISR 中的中断所需的所有处理，以及何时最好将部分处理延迟到任务，没有绝对的规则。在以下情况下，将处理延迟到任务最有用 :</p>
 <ul>
@@ -535,7 +535,7 @@
 <p>[1] 任务：使用直接到任务的通知将一个任务从中断中解禁，比使用二进制信号量更有效率。直接到任务的通知在第9章 “任务通知 “中才会涉及。</p>
 </blockquote>
 <p>正如之前在图 48 中所展示的，如果中断处理是特别时间关键的，则可以设置延迟处理任务的优先级，以确保该任务总是抢占系统中的其他任务。然后可以实现 ISR 以包含对 <code>portYIELD_FROM_ISR()</code> 的调用，确保 ISR 直接返回到中断处理被延迟到的任务。这样做的效果是确保整个事件处理在在时间上连续执行 ( 没有中断 )，就好像它全部在ISR本身内实现一样。图 49 重复了图 48 中的场景，但是更新了文本以描述如何使用信号量来控制延迟处理任务的执行。</p>
-<p><img src="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/image-20240401132340213.png" alt="图 49 使用二进制信号量实现延迟中断处理"></p>
+<p><img src="/Blogs/2024/06/15/chapter-6-zhong-duan-guan-li/image-20240401132340213.png" alt="图 49 使用二进制信号量实现延迟中断处理"></p>
 <p>延迟处理任务使用对信号量的阻塞 <code>"take"</code> 调用作为进入阻塞状态以等待事件发生的方法。当事件发生时，ISR 对同一信号量使用 <code>"give" </code> 操作来解锁任务，以便继续进行所需的事件处理。</p>
 <p><code>"Taking a semaphore (获取信号量)"</code> 和 <code>"giving a semaphore (给出信号量)"</code> 是根据其使用场景具有不同含义的概念。在这种中断同步场景中，二进制信号量在概念上可以被视为长度为 1 的队列。队列在任何时候最多可以包含一项，因此始终要么为空，要么为满（因此是二进制）。通过调用 <code>xSemaphoreTake()</code>，中断处理被延迟到的任务有效地试图用一个阻塞时间从队列中读取数据，从而导致任务在队列为空时进入阻塞状态。当事件发生时，ISR 使用 <code>xSemaphoreGiveFromISR()</code> 函数将一个令牌（信号量）放入队列中，使队列变满。这将导致任务退出阻塞状态并移除令牌，使队列再次为空。当任务完成其处理后，它会再次尝试从队列中读取，并发现队列为空，然后重新进入阻塞状态以等待下一个事件。图 50 演示了这个序列。</p>
 <p>图 50 显示了中断 <code>"giving (给出)"</code> 信号量，即使它没有首先 <code>"taking (获取)"</code> 信号量，以及任务 <code>"taking (获取)"</code> 信号量，但从未将其给出 (giving it back)。这就是为什么该场景被描述为在概念上类似于向队列写入和从队列读取的原因。它经常会引起混乱，因为它不遵循与其他信号量使用场景相同的规则，在其他信号量使用场景中，获取 (takes) 信号量的任务必须始终将其给出 (give it back)，例如第 7 章 “资源管理” 中描述的场景。</p>
@@ -714,8 +714,8 @@
 </code></pre>
 <p>清单 95. 示例 16 中 <code>main()</code> 的实现</p>
 <p>示例 16 产生的输出如图 51 所示。正如预期的那样，<code>vHandlerTask()</code> 在中断产生后立即进入了运行状态，因此任务的输出会拆分周期性任务产生的输出。在图52中提供了进一步的解释。</p>
-<p><img src="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/image-20240408200251795.png" alt="图 51. 执行示例 16 时产生的输出"></p>
-<p><img src="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/image-20240408200543993.png" alt="图 52. 执行例 16 时的执行顺序"></p>
+<p><img src="/Blogs/2024/06/15/chapter-6-zhong-duan-guan-li/image-20240408200251795.png" alt="图 51. 执行示例 16 时产生的输出"></p>
+<p><img src="/Blogs/2024/06/15/chapter-6-zhong-duan-guan-li/image-20240408200543993.png" alt="图 52. 执行例 16 时的执行顺序"></p>
 <h3 id="改进示例16中使用的任务的实现"><a href="#改进示例16中使用的任务的实现" class="headerlink" title="改进示例16中使用的任务的实现"></a>改进示例16中使用的任务的实现</h3><p>示例 16 使用一个二进制信号量来同步一个任务和一个中断。其执行顺序如下：</p>
 <ol>
 <li>中断发生了。</li>
@@ -862,7 +862,7 @@ xCountingSemaphore <span class="token operator">=</span> <span class="token func
 <p>清单 99. 示例 17 所使用的中断服务例程的实现</p>
 <p>所有其他的函数与示例 16 中使用的函数相比都没有修改。</p>
 <p>示例 17 执行时产生的输出如图 56 所示。可以看出，在每次产生中断时，中断处理被推迟到的任务会处理所有三个 [模拟] 事件。这些事件被锁存在信号的计数值中，允许任务依次处理它们。</p>
-<p><img src="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/image-20240409130405568.png" alt="图 56. 执行示例 17 时产生的输出"></p>
+<p><img src="/Blogs/2024/06/15/chapter-6-zhong-duan-guan-li/image-20240409130405568.png" alt="图 56. 执行示例 17 时产生的输出"></p>
 <h2 id="延迟工作到-RTOS-守护进程任务"><a href="#延迟工作到-RTOS-守护进程任务" class="headerlink" title="延迟工作到 RTOS 守护进程任务"></a>延迟工作到 RTOS 守护进程任务</h2><p>到目前为止，所介绍的延迟中断处理的示例都要求应用程序编写者为每个使用延迟处理技术的中断创建一个任务。还可以使用 <code>xTimerPendFunctionCallFromISR()</code> [1] API 函数将中断处理延迟到 RTOS 守护进程任务 (daemon task) 中 —— 无需为每个中断创建一个单独的任务。将中断处理延迟到守护任务被称为 <code>"集中延迟中断处理"</code> 。</p>
 <blockquote>
 <p>[1] xTimerPendFunctionCallFromISR()：在第 5 章中指出，守护进程任务最初被称为定时器服务任务，因为它最初只用来执行软件定时器回调函数。因此，<code>xTimerPendFunctionCall()</code> 是在 <code>timers.c</code> 中实现的，并且根据以实现函数的文件的名称为前缀的惯例，函数的名称以 <code>"Timer"</code> 为前缀。</p>
@@ -992,8 +992,8 @@ xCountingSemaphore <span class="token operator">=</span> <span class="token func
 </code></pre>
 <p>清单104. 示例18中 <code>main()</code> 的实现</p>
 <p>示例 18 产生的输出如图 57 所示。守护进程任务的优先级高于生成软件中断的任务的优先级，因此一旦生成中断，守护进程任务就会执行 <code>vDeferredHandlingFunction()</code>。这导致 <code>vDeferredHandlingFunction()</code> 输出的消息出现在周期性任务输出的两个消息之间，就像使用信号量取消阻塞专用延迟中断处理任务时一样。在图 58 中提供了进一步的解释。</p>
-<p><img src="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/image-20240410001119808.png" alt="图 57. 执行示例 18 时产生的输出"></p>
-<p><img src="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/image-20240410001514315.png" alt="图 58. 执行示例 18 时的执行顺序"></p>
+<p><img src="/Blogs/2024/06/15/chapter-6-zhong-duan-guan-li/image-20240410001119808.png" alt="图 57. 执行示例 18 时产生的输出"></p>
+<p><img src="/Blogs/2024/06/15/chapter-6-zhong-duan-guan-li/image-20240410001514315.png" alt="图 58. 执行示例 18 时的执行顺序"></p>
 <h2 id="在中断服务程序中使用队列"><a href="#在中断服务程序中使用队列" class="headerlink" title="在中断服务程序中使用队列"></a>在中断服务程序中使用队列</h2><p>二进制和计数信号量用于传递事件。队列用于传递事件和传输数据。</p>
 <p><code>xQueueSendToFrontFromISR()</code> 是 <code>xQueueSendToFront()</code> 在中断服务例程中使用安全的版本； <code>xQueueSendToBackFromISR()</code> 是 <code>xQueueSendToBack()</code> 在中断服务例程中使用安全的版本； <code>xQueueReceiveFromISR()</code> 是 <code>xQueueReceive()</code> 在中断服务例程中使用安全的版本。</p>
 <h3 id="xQueueSendToFrontFromISR-和xQueueSendToBackFromISR-API-函数"><a href="#xQueueSendToFrontFromISR-和xQueueSendToBackFromISR-API-函数" class="headerlink" title="xQueueSendToFrontFromISR() 和xQueueSendToBackFromISR() API 函数"></a>xQueueSendToFrontFromISR() 和xQueueSendToBackFromISR() API 函数</h3><pre class=" language-c"><code class="language-c">BaseType_t <span class="token function">xQueueSendToFrontFromISR</span><span class="token punctuation">(</span>QueueHandle_t xQueue<span class="token punctuation">,</span>
@@ -1173,8 +1173,8 @@ xCountingSemaphore <span class="token operator">=</span> <span class="token func
 </code></pre>
 <p>清单 110. 示例 19 的 <code>main()</code> 函数</p>
 <p>执行示例 19 时产生的输出如图 59 所示。可以看出，中断接收了所有五个整数，并产生了五个字符串作为响应。图 60 中给出了更多的解释。</p>
-<p><img src="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/image-20240411070715950.png" alt="图 59. 执行示例 19 时产生的输出"></p>
-<p><img src="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/image-20240411071042631.png" alt="图 60. 示例 19 产生的执行顺序"></p>
+<p><img src="/Blogs/2024/06/15/chapter-6-zhong-duan-guan-li/image-20240411070715950.png" alt="图 59. 执行示例 19 时产生的输出"></p>
+<p><img src="/Blogs/2024/06/15/chapter-6-zhong-duan-guan-li/image-20240411071042631.png" alt="图 60. 示例 19 产生的执行顺序"></p>
 <h2 id="中断嵌套"><a href="#中断嵌套" class="headerlink" title="中断嵌套"></a>中断嵌套</h2><p>在任务优先级和中断优先级之间出现混淆是很常见的。本节讨论中断优先级，本节讨论中断优先级，即中断服务例程 ( ISR ) 相对于彼此执行的优先级。分配给任务的优先级与分配给中断的优先级没有任何关系。硬件决定 ISR 何时执行，而软件决定任务何时执行。响应硬件中断而执行的 ISR 将中断任务，但任务不能抢占 ISR。</p>
 <p>支持中断嵌套的移植需要在 <code>FreeRTOSConfig.h</code> 中定义表 39 中详述的一个或两个常量。 <code>configMAX_SYSCALL_INTERRUPT_PRIORITY</code> 和 <code>configMAX_API_CALL_INTERRUPT_PRIORITY</code> 都定义相同的属性。较旧的 FreeRTOS 移植使用 <code>configMAX_SYSCALL_INTERRUPT_PRIORITY</code>，较新的 FreeRTOS 移植使用 <code>configMAX_API_CALL_INTERRUPT_PRIORITY</code>。</p>
 <p>表 39. 控制中断嵌套的常量</p>
@@ -1213,7 +1213,7 @@ xCountingSemaphore <span class="token operator">=</span> <span class="token func
 <li><code>configKERNEL_INTERRUPT_PRIORITY</code> 被设置为 1 。</li>
 <li><code>configMAX_SYSCALL_INTERRUPT_PRIORITY</code> 被设置为 3 。</li>
 </ul>
-<p><img src="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/image-20240411085426838.png" alt="图 61. 影响中断嵌套行为的常量"></p>
+<p><img src="/Blogs/2024/06/15/chapter-6-zhong-duan-guan-li/image-20240411085426838.png" alt="图 61. 影响中断嵌套行为的常量"></p>
 <p>参考图 61：</p>
 <ul>
 <li>当内核或应用程序位于临界段时，使用优先级 1 到 3 ( 含 ) 的中断将被阻止执行。以这些优先级运行的 ISR 可以使用中断安全的 FreeRTOS API 函数。临界段的描述见第 7 章。</li>
@@ -1227,7 +1227,7 @@ xCountingSemaphore <span class="token operator">=</span> <span class="token func
 <p>ARM Cortex 内核和 ARM 通用中断控制器 (GIC — Generic Interrupt Controller ) 使用数字上的低优先级数字来表示逻辑上的高优先级中断。这似乎违反直觉，并且很容易忘记。如果您希望为中断分配逻辑上较低的优先级，则必须为其分配较高的数字值。如果您希望为中断分配逻辑上较高的优先级，则必须为其分配较低的数字值。</p>
 <p><code>Cortex-M</code> 中断控制器允许使用最多 8 位来指定每个中断优先级，使 255 成为可能的最低优先级。0 是最高优先级。然而，<code>Cortex-M</code> 微控制器通常仅实现 8 个可能位的子集。实际实现的位数取决于微控制器系列。</p>
 <p>当仅实现了 8 个可能位的子集时，只能使用字节的最高有效位，而最低有效位则未实现。未实现的位可以取任何值，但通常将它们设置为  1 。 图 62 对此进行了演示，该图显示了二进制 101 的优先级如何存储在一个实现了 4 个优先位的<code>Cortex-M</code>微控制器中。</p>
-<p><img src="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/image-20240411174725336.png" alt="图 62. 实现 4 个优先级位的 Cortex-M 微控制器如何存储二进制 101 的优先级"></p>
+<p><img src="/Blogs/2024/06/15/chapter-6-zhong-duan-guan-li/image-20240411174725336.png" alt="图 62. 实现 4 个优先级位的 Cortex-M 微控制器如何存储二进制 101 的优先级"></p>
 <p>在图 62 中，二进制值 101 已移至最高有效四位，因为未实现最低有效四位。 未实现的位已设置为 1。</p>
 <p>某些库函数期望在将优先级值向上移至已实现的 ( 最高有效 ) 位之后指定优先级值。在使用这样的函数时，可以将图 62 所示的优先级指定为十进制 95 ( 0101 1111 ) 。十进制 95 将二进制 101 上移 4 以生成二进制 101nnnn ( 其中 ‘ n ‘ 是一个未实现的位 )，将未实现的位设置为 1 以生成二进制 1011111 。</p>
 <p>某些库函数期望在将优先级值向上移至已实现的 ( 最高有效 ) 位之前指定优先级值。使用此类函数时，图 62 中所示的优先级必须指定为十进制 5。十进制 5 是没有任何移位的二进制 101。</p>
@@ -1263,7 +1263,7 @@ xCountingSemaphore <span class="token operator">=</span> <span class="token func
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://koito-yuu153.github.io/Blogs/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/">https://koito-yuu153.github.io/Blogs/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/</a>
+                    <a href="https://koito-yuu153.github.io/Blogs/Blogs/2024/06/15/chapter-6-zhong-duan-guan-li/">https://koito-yuu153.github.io/Blogs/Blogs/2024/06/15/chapter-6-zhong-duan-guan-li/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -1377,48 +1377,12 @@ xCountingSemaphore <span class="token operator">=</span> <span class="token func
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
-            <div class="card">
-                <a href="/Blogs/2024/03/21/hexo-de-shi-yong-jiao-cheng/">
-                    <div class="card-image">
-                        
-                        
-                        <img src="/Blogs/medias/featureimages/3.jpg" class="responsive-img" alt="hexo的使用教程">
-                        
-                        <span class="card-title">hexo的使用教程</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            
-                        
-                    </div>
-                    <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2024-03-21
-                        </span>
-                        <span class="publish-author">
-                            
-                            <i class="fas fa-user fa-fw"></i>
-                            Koito Yuu
-                            
-                        </span>
-                    </div>
-                </div>
-                
-            </div>
-        </div>
-        
-        
-        <div class="article col s12 m6" data-aos="fade-up">
-            <div class="article-badge right-badge text-color">
-                本篇&nbsp;<i class="far fa-dot-circle"></i>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
             </div>
             <div class="card">
-                <a href="/Blogs/2024/03/21/chapter-6-zhong-duan-guan-li/">
+                <a href="/Blogs/2024/06/15/chapter-6-zhong-duan-guan-li/">
                     <div class="card-image">
                         
                         
@@ -1435,7 +1399,7 @@ xCountingSemaphore <span class="token operator">=</span> <span class="token func
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2024-03-21
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-06-15
                             </span>
                         <span class="publish-author">
                             
@@ -1450,6 +1414,47 @@ xCountingSemaphore <span class="token operator">=</span> <span class="token func
                     </div>
                 </div>
 
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/Blogs/medias/featureimages/12.jpg" class="responsive-img" alt="Chapter 5 软件定时器管理">
+                        
+                        <span class="card-title">Chapter 5 软件定时器管理</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-06-15
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/Blogs/categories/FreeRTOS/" class="post-category">
+                                    FreeRTOS
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
                 
             </div>
         </div>

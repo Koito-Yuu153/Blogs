@@ -396,7 +396,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2024-03-21
+                    2024-06-15
                 </div>
                 
 
@@ -452,7 +452,7 @@
 </li>
 </ol>
 <p>图38显示了一次性定时器和自动重载定时器之间的行为差异。虚线垂直线标记滴答中断发生的时间。</p>
-<p><img src="/Blogs/2024/03/21/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240330161114285.png" alt="图38一次性软件定时器和自动重载软件定时器之间的行为差异"></p>
+<p><img src="/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240330161114285.png" alt="图38一次性软件定时器和自动重载软件定时器之间的行为差异"></p>
 <p>参考图38：</p>
 <ul>
 <li><p>定时器 1 </p>
@@ -473,8 +473,8 @@
 </ul>
 <p>图39和图40分别显示了自动重载定时器和一次性定时器在休眠状态和运行状态之间的可能的转换。这两个图的关键区别在于定时器到期后进入的状态；自动重载定时器执行其回调函数，然后重新进入运行状态，一次性定时器执行其回调函数，然后进入休眠状态。</p>
 <p>xTimerDelete() API 函数的作用是：删除一个定时器。可以随时删除定时器。</p>
-<p><img src="/Blogs/2024/03/21/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240615012641295.png" alt="图 39 自动重载软件定时器状态和转换"></p>
-<p><img src="/Blogs/2024/03/21/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240330163007600.png" alt="图 40 一次性软件定时器状态和转换"></p>
+<p><img src="/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240615012641295.png" alt="图 39 自动重载软件定时器状态和转换"></p>
+<p><img src="/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240330163007600.png" alt="图 40 一次性软件定时器状态和转换"></p>
 <h2 id="软件定时器的上下文"><a href="#软件定时器的上下文" class="headerlink" title="软件定时器的上下文"></a>软件定时器的上下文</h2><h3 id="RTOS守护进程-定时器服务-任务"><a href="#RTOS守护进程-定时器服务-任务" class="headerlink" title="RTOS守护进程(定时器服务)任务"></a><strong>RTOS守护进程(定时器服务)任务</strong></h3><p>所有软件定时器回调函数都在同一 RTOS <code>守护进程任务-daemon task</code> (或 <code>“定时器服务任务-timer service task”</code> ) 的上下文中执行[1]。</p>
 <blockquote>
 <p>[1] 该任务过去被称为 “定时器服务任务” ，因为最初它只用于执行软件定时器回调函数。现在同一任务也用于其他目的，因此它被称为 “RTOS守护进程任务” 的更一般的名称。</p>
@@ -484,10 +484,10 @@
 <p>软件定时器回调函数不得调用会导致调用任务进入阻塞状态的 FreeRTOS API 函数，因为这样做将导致守护进程任务进入阻塞状态。</p>
 <h3 id="定时器命令队列"><a href="#定时器命令队列" class="headerlink" title="定时器命令队列"></a><strong>定时器命令队列</strong></h3><p>软件定时器 API 函数将命令从调用任务发送到称为 “定时器命令队列” 的队列上的守护进程任务。这如图 41 所示。命令的示例包括 <code>"start a timer (启动定时器)"</code> 、<code>stop a timer (停止定时器)</code> 和 <code>reset a timer (重置定时器)</code> 。</p>
 <p>定时器命令队列是在启动调度程序时自动创建的标准 FreeRTOS 队列。定时器命令队列的长度由 <code>FreeRTOSConfig.h</code> 中的 <code>configTIMER_QUEUE_LENGTH</code> 编译时配置常量设置。</p>
-<p><img src="/Blogs/2024/03/21/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240330165153654.png" alt="图 41 软件定时器API函数使用定时器命令队列与RTOS守护进程任务通信"></p>
+<p><img src="/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240330165153654.png" alt="图 41 软件定时器API函数使用定时器命令队列与RTOS守护进程任务通信"></p>
 <h3 id="守护进程任务调度"><a href="#守护进程任务调度" class="headerlink" title="守护进程任务调度"></a><strong>守护进程任务调度</strong></h3><p>守护进程任务与任何其他 FreeRTOS 任务一样进行调度；当守护进程任务是能够运行的最高优先级任务时，它只会处理命令或执行定时器回调函数。图 42 和图 43 演示了 <code>configTIMER_TASK_PRIORITY</code> 设置如何影响执行模式</p>
 <p>图 42 显示了当守护进程任务的优先级低于调用 <code>xTimerStart()</code> API 函数的任务的优先级时的执行模式</p>
-<p><img src="/Blogs/2024/03/21/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240330170229111.png" alt="图 42 调用xTimerStart()的任务的优先级高于守护进程任务的优先级时的执行模式"></p>
+<p><img src="/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240330170229111.png" alt="图 42 调用xTimerStart()的任务的优先级高于守护进程任务的优先级时的执行模式"></p>
 <p>参照图 42 ，其中任务1 的优先级高于守护进程任务的优先级，并且守护进程任务的优先级高于空闲任务的优先级：</p>
 <ol>
 <li>t1 时刻</li>
@@ -514,7 +514,7 @@
 </li>
 </ol>
 <p>图 43 显示了类似于图 42 所示的场景，但是这一次守护进程任务的优先级高于调用 <code>xTimerStart()</code> 的任务的优先级。</p>
-<p><img src="/Blogs/2024/03/21/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240331001216768.png" alt="图 43 当调用xTimerStart()的任务的优先级低于守护进程任务的优先级时的执行模式"></p>
+<p><img src="/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240331001216768.png" alt="图 43 当调用xTimerStart()的任务的优先级低于守护进程任务的优先级时的执行模式"></p>
 <p>参照图 43 ，其中守护进程任务的优先级高于任务1 的优先级，任务1 的优先级高于空闲任务的优先级：</p>
 <ol>
 <li><p>t1 时刻 </p>
@@ -691,7 +691,7 @@ TickType_t xTimeNow<span class="token punctuation">;</span>
 </code></pre>
 <p>清单 77.  示例 13 中的自动重载定时器使用的回调函数</p>
 <p>执行此示例将生成如图 44 所示的输出。图 44 显示了自动重载定时器的回调函数以500个滴答的固定周期执行 (清单 75 中的 <code>mainAUTO_RELOAD_TIMER_PERIOD</code> 设置为 500 )，当滴答计数为 3333 时，一次性定时器的回调函数只执行一次 (清单 75 中的 <code>mainOne_Shot_Timer_Period</code> 设置为 3333 )。</p>
-<p><img src="/Blogs/2024/03/21/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240331225428946.png" alt="图 44 执行示例 13 时产生的输出"></p>
+<p><img src="/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240331225428946.png" alt="图 44 执行示例 13 时产生的输出"></p>
 <h2 id="定时器-ID"><a href="#定时器-ID" class="headerlink" title="定时器 ID"></a>定时器 ID</h2><p>每个软件定时器都有一个 ID，它是应用程序编写者可以出于任何目的使用的标记值。ID 存储在空指针 <code>(void*)</code> 中，因此可以直接存储整数值、指向任何其他对象或用作函数指针。</p>
 <p>创建软件定时器时会为ID分配初始值 — 之后可以使用 <code>vTimerSetTimerID()</code> API函数更新 ID，并使用 <code>pvTimerGetTimerID()</code> API函数进行查询。</p>
 <p>与其他软件定时器 API 函数不同，<code>vTimerSetTimerID()</code> 和 <code>pvTimerGetTimerID()</code> 直接访问软件定时器 — 它们不向定时器命令队列发送命令。</p>
@@ -799,7 +799,7 @@ uint32_t ulExecutionCount<span class="token punctuation">;</span>
 </code></pre>
 <p>清单 81. 示例 14 中使用的定时器回调函数</p>
 <p>示例 14 产生的输出如图 45 所示。可以看到，自动重载定时器只执行了五次。</p>
-<p><img src="/Blogs/2024/03/21/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240401025314788.png" alt="图 45 执行示例 14 时产生的输出"></p>
+<p><img src="/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240401025314788.png" alt="图 45 执行示例 14 时产生的输出"></p>
 <h2 id="更改定时器的周期"><a href="#更改定时器的周期" class="headerlink" title="更改定时器的周期"></a>更改定时器的周期</h2><p>每个官方 FreeRTOS 移植都提供了一个或多个示例工程。大多数示例项目都是在运行中不断自检，LED用于提供项目状态的可视反馈；如果自检总是通过，则LED缓慢闪烁，如果自检失败，则LED快速闪烁。</p>
 <p>一些示例工程在任务中执行自检，并使用 <code>vTaskDelay()</code> 函数控制LED的翻转速率。其他示例工程在软件定时器回调函数中执行自检，并使用定时器的周期来控制LED的翻转速率。</p>
 <h3 id="xTimerChangePeriod-API函数"><a href="#xTimerChangePeriod-API函数" class="headerlink" title="xTimerChangePeriod()API函数"></a>xTimerChangePeriod()API函数</h3><p>使用 <code>xTimerChangePeriod()</code> 函数更改软件定时器的周期。</p>
@@ -876,7 +876,7 @@ uint32_t ulExecutionCount<span class="token punctuation">;</span>
 </code></pre>
 <p>清单 83. 使用 xTimerChangePeriod()</p>
 <h2 id="重置一个定时器"><a href="#重置一个定时器" class="headerlink" title="重置一个定时器"></a>重置一个定时器</h2><p>重置软件定时器意味着重新启动定时器；计时器的到期时间将根据重置计时器的时间重新计算，而不是相对于计时器最初启动的时间。图 46 演示了这一点，它显示了一个以 6 为周期启动的定时器，然后重置两次，最后到期并执行其回调函数。</p>
-<p><img src="/Blogs/2024/03/21/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240401041311370.png" alt="图 46. 启动和重置周期为 6 个滴答的软件定时器"></p>
+<p><img src="/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240401041311370.png" alt="图 46. 启动和重置周期为 6 个滴答的软件定时器"></p>
 <p>参考图 46：</p>
 <ul>
 <li>定时器 1 在 t1 时刻启动。它的周期为 6，因此它执行回调函数的时间最初计算为 t7，即启动后的 6 个滴答。</li>
@@ -992,7 +992,7 @@ TickType_t xTimeNow<span class="token punctuation">;</span>
 <li>当滴答计数为 1813、3114、4015 和 5016 时，发生了进一步的按键。所有这些按键都会导致定时器在到期之前被重置。</li>
 <li>定时器在滴答计数为 10016 时到期。此时，关闭背光。</li>
 </ul>
-<p><img src="/Blogs/2024/03/21/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240401055137191.png" alt="图 47 执行示例 15 时产生的输出"></p>
+<p><img src="/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240401055137191.png" alt="图 47 执行示例 15 时产生的输出"></p>
 <p>在图 47 中可以看到，定时器有 5000 个滴答的周期；最后一次按下按键后，背光恰好在 5000 次滴答后关闭，所以在最后一次重置定时器之后有 5000 个滴答。</p>
 
                 
@@ -1020,7 +1020,7 @@ TickType_t xTimeNow<span class="token punctuation">;</span>
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://koito-yuu153.github.io/Blogs/Blogs/2024/03/21/chapter-5-ruan-jian-ding-shi-qi-guan-li/">https://koito-yuu153.github.io/Blogs/Blogs/2024/03/21/chapter-5-ruan-jian-ding-shi-qi-guan-li/</a>
+                    <a href="https://koito-yuu153.github.io/Blogs/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/">https://koito-yuu153.github.io/Blogs/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -1138,13 +1138,13 @@ TickType_t xTimeNow<span class="token punctuation">;</span>
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/Blogs/2024/03/21/chapter-3-ren-wu-guan-li/">
+                <a href="/Blogs/2024/06/15/chapter-6-zhong-duan-guan-li/">
                     <div class="card-image">
                         
                         
-                        <img src="/Blogs/medias/featureimages/21.jpg" class="responsive-img" alt="Chapter 3 任务管理">
+                        <img src="/Blogs/medias/featureimages/22.jpg" class="responsive-img" alt="Chapter 6 中断管理">
                         
-                        <span class="card-title">Chapter 3 任务管理</span>
+                        <span class="card-title">Chapter 6 中断管理</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -1155,7 +1155,7 @@ TickType_t xTimeNow<span class="token punctuation">;</span>
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2024-03-21
+                            <i class="far fa-clock fa-fw icon-date"></i>2024-06-15
                         </span>
                         <span class="publish-author">
                             
@@ -1179,13 +1179,13 @@ TickType_t xTimeNow<span class="token punctuation">;</span>
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/Blogs/2024/03/21/hexo-de-shi-yong-jiao-cheng/">
+                <a href="/Blogs/2024/06/15/chapter-3-ren-wu-guan-li/">
                     <div class="card-image">
                         
                         
-                        <img src="/Blogs/medias/featureimages/3.jpg" class="responsive-img" alt="hexo的使用教程">
+                        <img src="/Blogs/medias/featureimages/21.jpg" class="responsive-img" alt="Chapter 3 任务管理">
                         
-                        <span class="card-title">hexo的使用教程</span>
+                        <span class="card-title">Chapter 3 任务管理</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -1196,12 +1196,16 @@ TickType_t xTimeNow<span class="token punctuation">;</span>
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2024-03-21
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-06-15
                             </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-user fa-fw"></i>
-                            Koito Yuu
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/Blogs/categories/FreeRTOS/" class="post-category">
+                                    FreeRTOS
+                                </a>
+                            
                             
                         </span>
                     </div>

@@ -399,7 +399,7 @@ FreeRTOS 如何选择在任何给定时间应该执行哪个任务。
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2024-03-21
+                    2024-06-15
                 </div>
                 
 
@@ -479,7 +479,7 @@ int32_t lVariableExample <span class="token operator">=</span> <span class="toke
 <h2 id="3-3-顶层任务状态"><a href="#3-3-顶层任务状态" class="headerlink" title="3.3 顶层任务状态"></a>3.3 顶层任务状态</h2><p>应用程序可以包含许多任务。 如果运行应用程序的处理器是单核的，那么在任何给定时间只能执行一个任务。 这意味着任务可以存在两种状态：运行和未运行。 首先考虑这种简单化的模型，但请记住，这是一种过度简化。 在本章的后面，显示 “未运行” 状态实际上包含许多子状态。</p>
 <p>一个应用程序可以包含许多任务。如果运行应用程序的处理器是单核的，则在任何给定时间只能执行一个任务。这意味着任务可以存在于两种状态之一：<code>运行 ( Running )</code> 和 <code>非运行 ( No Running )</code> 。首先考虑这种简单化的模型，但请记住，它过于简单化了。本章后面显示 <code>"非运行 ( No Running )"</code> 状态实际上包含许多子状态。</p>
 <p>当任务处于运行状态时，处理器正在执行任务的代码。当任务处于 <code>"非运行 ( No Running )"</code> 状态时，该任务处于休眠状态，其状态已被保存，以便下次调度程序决定它应该进入 <code>"运行 ( Running ) "</code> 状态时恢复执行。   当任务恢复执行时，它会从上次离开 <code>"运行 ( Running )"</code> 状态之前即将执行的指令开始执行。</p>
-<p><img src="/Blogs/2024/03/21/chapter-3-ren-wu-guan-li/image-20240526132629539.png" alt="图 9. 顶层任务状态和转换"></p>
+<p><img src="/Blogs/2024/06/15/chapter-3-ren-wu-guan-li/image-20240526132629539.png" alt="图 9. 顶层任务状态和转换"></p>
 <p>从 “未运行” 状态转换为 “运行” 状态的任务被称为 “切入” 或 “换入”。 相反，从 “运行” 状态转换到 “未运行” 状态的任务据说已被 “切出” 或 “换出”。 FreeRTOS 的调度程序是唯一可以切换任务的实体。</p>
 <p>从非运行状态转换到运行状态的任务被称为 <code>"切换入 ( switched in ) "</code> 或 <code>"交换入 ( swapped in )"</code>。相反，从运行状态转换到非运行状态的任务被称为 <code>"切换出 ( switched out )"</code> 或 <code>"交换出 ( swapped out )"</code>。FreeRTOS 调度程序是唯一可以切换入和切换出任务的实体。</p>
 <h2 id="3-4-创建任务"><a href="#3-4-创建任务" class="headerlink" title="3.4 创建任务"></a>3.4 创建任务</h2><h3 id="xTaskCreate-API-函数"><a href="#xTaskCreate-API-函数" class="headerlink" title="xTaskCreate() API 函数"></a>xTaskCreate() API 函数</h3><p>FreeRTOS V9.0.0 还包括 <code>xTaskCreateStatic()</code> 函数，该函数在编译时静态地分配创建任务所需的内存: 使用 FreeRTOS <code>xTaskCreate()</code> API 函数创建任务。这可能是所有 API 函数中最复杂的，因此很不幸，它是第一个遇到的函数，但是必须首先掌握任务，因为它们是多任务系统中最基本的组件。本书附带的所有示例都使用了 <code>xTaskCreate()</code> 函数，因此有大量示例可供参考。</p>
@@ -601,7 +601,7 @@ int32_t lVariableExample <span class="token operator">=</span> <span class="toke
 </code></pre>
 <p>清单 16. 启动示例 1 任务</p>
 <p>执行该示例将产生图 10 中所示的输出。</p>
-<p><img src="/Blogs/2024/03/21/chapter-3-ren-wu-guan-li/image-20240526181455382.png" alt="图 10. 执行示例 1 时产生的输出"></p>
+<p><img src="/Blogs/2024/06/15/chapter-3-ren-wu-guan-li/image-20240526181455382.png" alt="图 10. 执行示例 1 时产生的输出"></p>
 <blockquote>
 <p>屏幕截图显示每个任务在下一个任务执行之前打印一次其消息。   这是使用 FreeRTOS Windows 模拟器产生的人为场景。 Windows 模拟器并不是真正的实时。此外，写入 Windows 控制台需要相对较长的时间，并会导致一系列 Windows 系统调用。在具有快速且非阻塞打印功能的真正嵌入式目标上执行相同的代码可能会导致每个任务在切换出去以允许其他任务运行之前多次打印其字符串。</p>
 </blockquote>
@@ -609,7 +609,7 @@ int32_t lVariableExample <span class="token operator">=</span> <span class="toke
 <p>图11底部的箭头显示了从时间 t1 开始的时间流逝。彩色线显示每个时间点正在执行哪个任务 —— 例如，任务 1 在时间 t1 和时间 t2 之间执行。</p>
 <p>任何时候只有一个任务可以处于运行状态。 因此，当一个任务进入 <code>"运行 ( Running ) "</code>  状态 ( 任务被切入 ) 时，另一个任务进入 <code>"非运行 ( No Running ) "</code> 状态（任务被切出）。 </p>
 <p>任一时刻只能有一个任务处于运行状态。因此，当一个任务进入“正在运行”状态（任务被切换入）时，另一个任务进入“未运行”状态（任务被切换出）。</p>
-<p><img src="/Blogs/2024/03/21/chapter-3-ren-wu-guan-li/image-20240526182954329.png" alt="图 11. 两个示例 1 任务的实际执行模式"></p>
+<p><img src="/Blogs/2024/06/15/chapter-3-ren-wu-guan-li/image-20240526182954329.png" alt="图 11. 两个示例 1 任务的实际执行模式"></p>
 <p>示例 1 在启动调度程序之前从 <code>main()</code> 中创建了两个任务。也可以从另一个任务中创建一个任务。例如，可以从任务 1 中创建任务 2，如清单 17 所示。</p>
 <pre class=" language-c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">vTask1</span><span class="token punctuation">(</span> <span class="token keyword">void</span> <span class="token operator">*</span>pvParameters <span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
@@ -716,7 +716,7 @@ int32_t lVariableExample <span class="token operator">=</span> <span class="toke
 <p>为了能够选择要运行的下一个任务，调度程序本身必须在每个时间片的末尾执行。 称为 “嘀嗒中断” 的周期性中断用于此目的。 时间片的长度由嘀嗒中断频率有效设置，嘀嗒中断频率由应用程序在 <code>FreeRTOSConfig.h</code> 中定义的 <code>configTICK_RATE_HZ</code> 编译时配置常量配置。 例如，如果 <code>configTICK_RATE_HZ</code> 设置为 100（Hz），则时间片将为 10 毫秒。 两次嘀嗒中断之间的时间称为 “嘀嗒期”。 一个时间片等于一个嘀嗒时间段。</p>
 <p>图 11 可以展开来显示调度程序本身在执行序列中的执行情况。如图 12 所示，其中顶部行显示调度程序何时执行，细箭头显示从任务到嘀嗒中断，然后从嘀嗒中断返回到不同任务的执行顺序。</p>
 <p><code>configTICK_RATE_HZ</code> 的最佳值取决于正在开发的应用程序，但其值通常为 100。</p>
-<p><img src="/Blogs/2024/03/21/chapter-3-ren-wu-guan-li/image-20240527235850366.png" alt="图 12. 执行序列展开以显示嘀嗒中断执行"></p>
+<p><img src="/Blogs/2024/06/15/chapter-3-ren-wu-guan-li/image-20240527235850366.png" alt="图 12. 执行序列展开以显示嘀嗒中断执行"></p>
 <p>FreeRTOS API 调用始终以嘀嗒周期的倍数指定时间，这通常被简单地称为嘀嗒。<code>pdMS_TO_TICKS()</code> 宏将以毫秒为单位的时间转换为以嘀嗒为单位的时间。可用的分辨率取决于定义的嘀嗒频率，如果嘀嗒频率高于 1 KHz (<code>configTICK RATE HZ</code> 大于 1000)，则不能使用 <code>pdMS_TO_TICKS()</code>。则无法使用 <code>pdMS_TO_TICKS()</code>。清单 20 显示了如何使用 <code>pdMS_TO_TICKS()</code> 将指定为 200 毫秒的时间转换为以嘀嗒为单位指定的等效时间。</p>
 <pre class=" language-c"><code class="language-c"><span class="token comment" spellcheck="true">/* pdMS_TO_TICKS() 将以毫秒为单位的时间作为其唯一参数，并计算为以嘀嗒周期为单位的等效时间。 
 此示例显示 xTimeInTicks 设置为等于 200 毫秒的嘀嗒周期数。 */</span>
@@ -752,10 +752,10 @@ TickType_t xTimeInTicks <span class="token operator">=</span> <span class="token
 <p>清单 21. 创建两个不同优先级的任务</p>
 <p>示例 3 生成的输出如图 13 所示。</p>
 <p>调度程序将始终选择能够运行的最高优先级任务。 任务 2 的优先级高于任务 1，并且始终能够运行；因此，任务 2 是唯一进入运行状态的任务。 由于任务 1 永远不会进入运行状态，因此它永远不会打印出其字符串。则称任务1被任务2 “ 剥夺 “ 了处理时间。( Task 1 is said to be ‘starved’ of processing time by Task 2.  )</p>
-<p><img src="/Blogs/2024/03/21/chapter-3-ren-wu-guan-li/image-20240529001654557.png" alt="图 13. 以不同优先级运行两个任务"></p>
+<p><img src="/Blogs/2024/06/15/chapter-3-ren-wu-guan-li/image-20240529001654557.png" alt="图 13. 以不同优先级运行两个任务"></p>
 <p>任务2总是能够运行，因为它永远不需要等待任何东西  —— 它要么是在一个空循环中循环，要么打印到终端。</p>
 <p>图 14 显示了示例 3 的执行顺序。</p>
-<p><img src="/Blogs/2024/03/21/chapter-3-ren-wu-guan-li/image-20240529001913254.png" alt="图 14. 当一个任务的优先级高于另一个任务时的执行模式"></p>
+<p><img src="/Blogs/2024/06/15/chapter-3-ren-wu-guan-li/image-20240529001913254.png" alt="图 14. 当一个任务的优先级高于另一个任务时的执行模式"></p>
 <h2 id="3-7-展开说明-“-非运行-“-状态"><a href="#3-7-展开说明-“-非运行-“-状态" class="headerlink" title="3.7 展开说明 “ 非运行 “ 状态"></a>3.7 展开说明 “ 非运行 “ 状态</h2><p>到目前为止，创建的任务总是有处理要执行，并且不需要等待任何事情 —— 因为它们不需要等待任何事情，所以它们总是能够进入运行状态。这种类型的 “ 连续处理 ( continuous processing ) “ 任务的用途有限，因为它们只能以最低优先级创建。如果它们以任何其他优先级运行，它们将完全阻止优先级较低的任务运行。</p>
 <p>为了使任务有用，必须重写它们以使其成为事件驱动的。 事件驱动的任务只有在触发它的事件发生后才能执行工作 ( 处理 )，并且在该事件发生之前无法进入运行状态。 调度程序始终选择能够运行的最高优先级任务。高优先级任务无法运行意味着调度程序无法选择它们，而必须选择能够运行的较低优先级任务。 因此，使用事件驱动的任务意味着可以以不同的优先级创建任务，而最高优先级的任务不会耗尽所有较低优先级的任务的处理时间。</p>
 <h3 id="阻塞状态"><a href="#阻塞状态" class="headerlink" title="阻塞状态"></a>阻塞状态</h3><p>正在等待事件的任务被认为处于 <code>"阻塞 ( Blocked ) "</code> 状态，这是 <code>"非运行 ( No Running ) "</code> 状态的子状态。</p>
@@ -816,10 +816,10 @@ TickType_t xTimeInTicks <span class="token operator">=</span> <span class="token
 </code></pre>
 <p>清单 23. 空循环延迟已被 <code>vTaskDelay()</code> 调用替换后的示例任务的源代码</p>
 <p>尽管这两个任务仍以不同的优先级创建，但现在它们都将运行。示例 4 的输出（如图 16 所示）证实了预期的行为。</p>
-<p><img src="/Blogs/2024/03/21/chapter-3-ren-wu-guan-li/image-20240605201928489.png" alt="图 16. 执行示例 4 时产生的输出"></p>
+<p><img src="/Blogs/2024/06/15/chapter-3-ren-wu-guan-li/image-20240605201928489.png" alt="图 16. 执行示例 4 时产生的输出"></p>
 <p>图 17 所示的执行序列解释了为什么两个任务都会运行，即使它们是以不同的优先级创建的。为简单起见，这里省略了调度程序本身的执行。</p>
 <p>空闲任务在调度程序启动时自动创建，以确保始终至少有一个任务可以运行 ( 至少有一个任务处于就绪状态 ) 。第 3.8 节 空闲任务和空闲任务钩子 更详细地描述了空闲任务。</p>
-<p><img src="/Blogs/2024/03/21/chapter-3-ren-wu-guan-li/image-20240605202818532.png" alt="图 17. 任务使用 vTaskDelay() 代替空循环时的执行顺序"></p>
+<p><img src="/Blogs/2024/06/15/chapter-3-ren-wu-guan-li/image-20240605202818532.png" alt="图 17. 任务使用 vTaskDelay() 代替空循环时的执行顺序"></p>
 <p>这两个任务只有实现方式发生了变化，功能没有变化。将图 17 与图 12 进行比较可以清楚地看出，此功能是以更高效的方式实现的。</p>
 <p>图 12 显示了当任务使用空循环来创建延迟时的执行模式——始终运行，因此在任务之间使用百分之百的可用处理器时间。 图 17 显示了任务在整个延迟期间进入阻塞状态时的执行模式，因此只有当它们确实有需要执行的工作时 ( 在本例中只是一条要打印出来的消息 ) 才会使用处理器时间，因此仅使用可用处理时间的一小部分。</p>
 <p>在图 17 的场景中，每次任务离开阻塞状态时，它们都会执行一小段时钟周期，然后重新进入阻塞状态。大多数时候，没有应用程序任务可以运行 ( 没有应用程序任务处于就绪状态 ) ，因此，没有应用程序任务可以选择进入运行状态。在这种情况下，空闲任务将运行。分配给空闲任务的处理时间量是系统中备用处理能力的衡量标准。使用 RTOS 可以显著增加备用处理能力，只需允许应用程序完全由事件驱动即可。</p>
@@ -925,8 +925,8 @@ TickType_t xLastWakeTime<span class="token punctuation">;</span>
 </code></pre>
 <p>清单 27. 示例 6 中使用的周期性任务</p>
 <p>图 19 显示了示例 6 产生的输出，并解释了图 20 中显示的执行序列所观察到的行为。</p>
-<p><img src="/Blogs/2024/03/21/chapter-3-ren-wu-guan-li/image-20240609003733891.png" alt="图 19. 执行示例 6 时产生的输出"></p>
-<p><img src="/Blogs/2024/03/21/chapter-3-ren-wu-guan-li/image-20240609004733190.png" alt="图 20. 示例 6 的执行模式"></p>
+<p><img src="/Blogs/2024/06/15/chapter-3-ren-wu-guan-li/image-20240609003733891.png" alt="图 19. 执行示例 6 时产生的输出"></p>
+<p><img src="/Blogs/2024/06/15/chapter-3-ren-wu-guan-li/image-20240609004733190.png" alt="图 20. 示例 6 的执行模式"></p>
 <h2 id="3-8-空闲任务和空闲任务钩子"><a href="#3-8-空闲任务和空闲任务钩子" class="headerlink" title="3.8 空闲任务和空闲任务钩子"></a>3.8 空闲任务和空闲任务钩子</h2><p>示例 4 中创建的任务大部分时间处于阻塞状态。处于此状态时，它们无法运行，因此无法被调度程序选中。</p>
 <p>必须始终至少有一个任务可以进入运行状态 [1] 。为确保这种情况，在调用 <code>vTaskStartScheduler()</code> 时，调度程序会自动创建一个空闲任务。空闲任务除了处于循环中之外几乎不执行其他操作 — 因此，与最初第一个示例中的任务一样，它始终能够运行。</p>
 <blockquote>
@@ -1000,7 +1000,7 @@ TickType_t xLastWakeTime<span class="token punctuation">;</span>
 <p>清单 30. 示例任务的源代码现在打印出 <code>ulIdleCycleCount</code> 值</p>
 <p>示例 7 产生的输出如图 21 所示。 因此，在应用任务的每次迭代之间，空闲任务钩子函数被调用大约 400 万次（迭代次数取决于演示执行的硬件的速度）。</p>
 <p>示例 7 产生的输出如图 21 所示。它表明空闲任务钩子函数在应用程序任务的每次迭代之间被调用大约 400 万次 ( 迭代次数取决于执行演示的硬件的速度 ) 。</p>
-<p><img src="/Blogs/2024/03/21/chapter-3-ren-wu-guan-li/image-20240609143325610.png" alt="图 21. 执行示例 7 时产生的输出"></p>
+<p><img src="/Blogs/2024/06/15/chapter-3-ren-wu-guan-li/image-20240609143325610.png" alt="图 21. 执行示例 7 时产生的输出"></p>
 <h2 id="3-9-更改任务的优先级"><a href="#3-9-更改任务的优先级" class="headerlink" title="3.9 更改任务的优先级"></a>3.9 更改任务的优先级</h2><h3 id="vTaskPrioritySet-API-函数"><a href="#vTaskPrioritySet-API-函数" class="headerlink" title="vTaskPrioritySet() API 函数"></a>vTaskPrioritySet() API 函数</h3><p><code>vTaskPrioritySet()</code> API 函数可用于在调度程序启动后更改任何任务的优先级。请注意，当 <code>FreeRTOSConfig.h</code> 中的 <code>INCLUDE_vTaskPrioritySet</code> 设置为 1 时，<code>vTaskPrioritySet()</code> API 函数是可用的。</p>
 <p>启动调度程序后，可以使用 <code>vTaskPrioritySet()</code> API 函数来更改任何任务的优先级。请注意，仅当 <code>FreeRTOSConfig.h</code> 中的 <code>INCLUDE_vTaskPrioritySet</code> 设置为 1 时，<code>vTaskPrioritySet()</code> API 函数才可用。</p>
 <pre class=" language-c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">vTaskPrioritySet</span><span class="token punctuation">(</span> TaskHandle_t pxTask<span class="token punctuation">,</span> UBaseType_t uxNewPriority <span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -1145,7 +1145,7 @@ TaskHandle_t xTask2Handle <span class="token operator">=</span> <span class="tok
 
 
 
-<p><img src="/Blogs/2024/03/21/chapter-3-ren-wu-guan-li/image-20240609163343194.png" alt="图 23. 执行示例 8 时产生的输出"></p>
+<p><img src="/Blogs/2024/06/15/chapter-3-ren-wu-guan-li/image-20240609163343194.png" alt="图 23. 执行示例 8 时产生的输出"></p>
 <h2 id="3-10-删除任务"><a href="#3-10-删除任务" class="headerlink" title="3.10 删除任务"></a>3.10 删除任务</h2><h3 id="vTaskDelete-API-函数"><a href="#vTaskDelete-API-函数" class="headerlink" title="vTaskDelete() API 函数"></a>vTaskDelete() API 函数</h3><p>任务可以使用 <code>vTaskDelete()</code> API 函数删除自身或任何其他任务。请注意，仅当 <code>FreeRTOSConfig.h</code> 中的 <code>INCLUDE_vTaskDelete</code> 设置为 1 时，<code>vTaskDelete()</code> API 函数才可用。</p>
 <p>删除的任务不再存在，无法再次进入运行状态。</p>
 <p>空闲任务负责释放分配给已删除任务的内存。因此，使用 <code>vTaskDelete()</code> API 函数的应用程序不要完全剥夺 ( starve ) 空闲任务的所有处理时间，这一点很重要。</p>
@@ -1224,7 +1224,7 @@ TaskHandle_t xTask2Handle <span class="token operator">=</span> <span class="tok
 <span class="token punctuation">}</span>
 </code></pre>
 <p>清单 39. 示例 9 的任务 2 的实现</p>
-<p><img src="/Blogs/2024/03/21/chapter-3-ren-wu-guan-li/image-20240610022134603.png" alt="执行示例 9 时产生的输出"></p>
+<p><img src="/Blogs/2024/06/15/chapter-3-ren-wu-guan-li/image-20240610022134603.png" alt="执行示例 9 时产生的输出"></p>
 <p>![图 25. 示例 9 的执行顺序](Chapter 3 任务管理/image-20240610023224251.png)</p>
 <h2 id="3-11-线程本地存储"><a href="#3-11-线程本地存储" class="headerlink" title="3.11 线程本地存储"></a>3.11 线程本地存储</h2><p>待完成。本节将在最终发布之前编写。</p>
 <blockquote>
@@ -1279,7 +1279,7 @@ TaskHandle_t xTask2Handle <span class="token operator">=</span> <span class="tok
 </tbody></table>
 <p>图 26 和图 27 说明了当使用具有时间分片算法的固定优先级抢占式调度时如何调度任务。 图 26 显示了当应用程序中的所有任务具有唯一优先级时，选择任务以进入“运行”状态的顺序。 图 27 显示了当应用程序中的两个任务共享优先级时，选择任务以进入“运行”状态的顺序。</p>
 <p>图 26 和图 27 演示了使用 <code>" 带时间片的固定优先级抢占式调度 ( Fixed Priority Pre-emptive Scheduling with Time Slicing ) "</code>  算法时任务的调度方式。图 26 显示了当应用程序中的所有任务都具有唯一的优先级时，选择任务进入运行状态的顺序。图 27 显示了当应用程序中的两个任务共享一个优先级时，选择任务进入运行状态的顺序。</p>
-<p><img src="/Blogs/2024/03/21/chapter-3-ren-wu-guan-li/image-20240610125928163.png" alt="图 26. 执行模式突出显示假设应用程序中的任务优先级和抢占，其中每个任务都被分配了唯一的优先级"></p>
+<p><img src="/Blogs/2024/06/15/chapter-3-ren-wu-guan-li/image-20240610125928163.png" alt="图 26. 执行模式突出显示假设应用程序中的任务优先级和抢占，其中每个任务都被分配了唯一的优先级"></p>
 <p>参考图26 : </p>
 <ol>
 <li><p><strong>空闲任务</strong> ：空闲任务以最低优先级运行，因此每次较高优先级的任务进入就绪状态时，空闲任务都会被抢占 —— 例如在时间 t3、t5 和 t9。</p>
@@ -1293,7 +1293,7 @@ TaskHandle_t xTask2Handle <span class="token operator">=</span> <span class="tok
 <li><p><strong>任务 1</strong> : 任务 1 也是一个事件驱动任务。它以最高的优先级执行，因此可以抢占系统中的任何其他任务。图中显示的唯一任务 1 事件发生在时间 t10，此时任务 1 抢占任务 2。只有在任务 1 于时间 t11 重新进入阻塞状态后，任务 2 才能完成其处理。</p>
 </li>
 </ol>
-<p><img src="/Blogs/2024/03/21/chapter-3-ren-wu-guan-li/image-20240610154453687.png" alt="图 27. 执行模式突出显示假设应用程序中的任务优先级和时间片，其中两个任务以相同的优先级运行"></p>
+<p><img src="/Blogs/2024/06/15/chapter-3-ren-wu-guan-li/image-20240610154453687.png" alt="图 27. 执行模式突出显示假设应用程序中的任务优先级和时间片，其中两个任务以相同的优先级运行"></p>
 <p>参考图 27 : </p>
 <ol>
 <li><p><strong>空闲任务与任务 2</strong>：空闲任务和任务 2 都是连续处理 ( continuous processing ) 任务，优先级均为 0 ( 最低优先级 ) 。调度程序仅在没有更高优先级的任务可运行时才将处理时间分配给优先级 0 任务，并通过时间分片共享分配给优先级 0 任务的时间。每次嘀嗒中断都会开始一个新的时间片，在图 27 中，时间片为 t1、t2、t3、t4、t5、t8、t9、t10 和 t11。</p>
@@ -1309,7 +1309,7 @@ TaskHandle_t xTask2Handle <span class="token operator">=</span> <span class="tok
 <li>如果 <code>configIDLE_SHOULD_YIELD</code> 设置为 1，则如果有其他空闲优先级任务处于就绪状态，则空闲任务将在其循环的每次迭代中让出 yield ( 自愿放弃其分配的时间片的剩余部分 ) 。</li>
 </ul>
 <p>图 27 中所示的执行模式是当 <code>configIDLE_SHOULD_YIELD</code> 设置为 0 时将观察到的内容。图 28 中所示的执行模式是在 <code>configIDLE_SHOULD_YIELD</code> 设置为 1 时在相同场景中观察到的内容。</p>
-<p><img src="/Blogs/2024/03/21/chapter-3-ren-wu-guan-li/image-20240611075853590.png" alt="图 28. 与图 27 所示场景相同的执行模式，但这次将 configIDLE_SHOULD_YIELD 设置为 1"></p>
+<p><img src="/Blogs/2024/06/15/chapter-3-ren-wu-guan-li/image-20240611075853590.png" alt="图 28. 与图 27 所示场景相同的执行模式，但这次将 configIDLE_SHOULD_YIELD 设置为 1"></p>
 <p>图 28 还显示，当 <code>configIDLE_SHOULD_YIELD</code> 设置为 1 时，在空闲任务之后被选择进入运行状态的任务不会执行整个时间片，而是执行空闲任务让出的时间片的剩余部分。</p>
 <h3 id="优先级抢占式调度-无时间片"><a href="#优先级抢占式调度-无时间片" class="headerlink" title="优先级抢占式调度 ( 无时间片 )"></a>优先级抢占式调度 ( 无时间片 )</h3><p>没有时间切片的优先抢占式调度保持与上一节中描述的相同的任务选择和抢占算法，但不使用时间切片在具有相同优先级的任务之间共享处理时间。</p>
 <p>表 16 显示了将 FreeRTOS 调度程序配置为使用无时间片的优先级抢占式调度的 <code>FreeRTOSConfig.h</code> 设置。</p>
@@ -1336,7 +1336,7 @@ TaskHandle_t xTask2Handle <span class="token operator">=</span> <span class="tok
 <li>处于运行状态的任务进入阻塞状态或者暂停状态。</li>
 </ul>
 <p>不使用时间片时，任务上下文切换次数比使用时间片时少。因此，关闭时间片可减少调度程序的处理开销。但是，关闭时间片也会导致优先级相同的任务收到的处理时间量相差很大，如图 29 所示。因此，不使用时间片运行调度程序被视为一种高级技术，仅应由经验丰富的用户使用。</p>
-<p><img src="/Blogs/2024/03/21/chapter-3-ren-wu-guan-li/image-20240612131241019.png" alt="图 29. 执行模式，演示当不使用时间片时，相同优先级的任务如何获得截然不同的处理时间"></p>
+<p><img src="/Blogs/2024/06/15/chapter-3-ren-wu-guan-li/image-20240612131241019.png" alt="图 29. 执行模式，演示当不使用时间片时，相同优先级的任务如何获得截然不同的处理时间"></p>
 <p>参考图 29 ，假设 <code>configIDLE_SHOULD_YIELD</code> 设置为 0：</p>
 <ol>
 <li><p><strong>嘀嗒中断</strong>：</p>
@@ -1373,7 +1373,7 @@ TaskHandle_t xTask2Handle <span class="token operator">=</span> <span class="tok
 </tbody></table>
 <p>当使用协作式调度程序时，仅当运行状态任务进入阻塞状态，或运行状态任务通过调用 <code>taskYIELD()</code> 显式地让出 ( 手动请求重新调度 ) 时，才会发生上下文切换。任务永远不会被抢占，因此不能使用时间片。</p>
 <p>图 30 演示了协作式调度程序的行为。图 30 中的水平虚线显示任务何时处于就绪状态。</p>
-<p><img src="/Blogs/2024/03/21/chapter-3-ren-wu-guan-li/image-20240613005719519.png" alt="图 30. 演示协作式调度程序行为的执行模式"></p>
+<p><img src="/Blogs/2024/06/15/chapter-3-ren-wu-guan-li/image-20240613005719519.png" alt="图 30. 演示协作式调度程序行为的执行模式"></p>
 <p>参考图 30 : </p>
 <ol>
 <li><p><strong>任务 1</strong>：</p>
@@ -1435,7 +1435,7 @@ TaskHandle_t xTask2Handle <span class="token operator">=</span> <span class="tok
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://koito-yuu153.github.io/Blogs/Blogs/2024/03/21/chapter-3-ren-wu-guan-li/">https://koito-yuu153.github.io/Blogs/Blogs/2024/03/21/chapter-3-ren-wu-guan-li/</a>
+                    <a href="https://koito-yuu153.github.io/Blogs/Blogs/2024/06/15/chapter-3-ren-wu-guan-li/">https://koito-yuu153.github.io/Blogs/Blogs/2024/06/15/chapter-3-ren-wu-guan-li/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -1549,54 +1549,11 @@ TaskHandle_t xTask2Handle <span class="token operator">=</span> <span class="tok
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
-            <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;本篇
-            </div>
-            <div class="card">
-                <a href="/Blogs/2024/03/21/chapter-3-ren-wu-guan-li/">
-                    <div class="card-image">
-                        
-                        
-                        <img src="/Blogs/medias/featureimages/21.jpg" class="responsive-img" alt="Chapter 3 任务管理">
-                        
-                        <span class="card-title">Chapter 3 任务管理</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            
-                        
-                    </div>
-                    <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2024-03-21
-                            </span>
-                        <span class="publish-author">
-                            
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/Blogs/categories/FreeRTOS/" class="post-category">
-                                    FreeRTOS
-                                </a>
-                            
-                            
-                        </span>
-                    </div>
-                </div>
-
-                
-            </div>
-        </div>
-        
-        
         <div class="article col s12 m6" data-aos="fade-up">
-            <div class="article-badge right-badge text-color">
-                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
-            </div>
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/Blogs/2024/03/21/chapter-5-ruan-jian-ding-shi-qi-guan-li/">
+                <a href="/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/">
                     <div class="card-image">
                         
                         
@@ -1612,9 +1569,9 @@ TaskHandle_t xTask2Handle <span class="token operator">=</span> <span class="tok
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2024-03-21
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2024-06-15
+                        </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -1623,6 +1580,43 @@ TaskHandle_t xTask2Handle <span class="token operator">=</span> <span class="tok
                                     FreeRTOS
                                 </a>
                             
+                            
+                        </span>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/Blogs/2024/03/21/hexo-de-shi-yong-jiao-cheng/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/Blogs/medias/featureimages/3.jpg" class="responsive-img" alt="hexo的使用教程">
+                        
+                        <span class="card-title">hexo的使用教程</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-03-21
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            Koito Yuu
                             
                         </span>
                     </div>
