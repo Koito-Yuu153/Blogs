@@ -434,7 +434,7 @@
 <li>如何创建、启动、重置和更改软件定时器的周期。</li>
 </ul>
 <h2 id="软件定时器回调函数"><a href="#软件定时器回调函数" class="headerlink" title="软件定时器回调函数"></a>软件定时器回调函数</h2><p>软件定时器回调函数被实现为 C 函数。它们唯一的特别之处是它们的原型，它必须返回void，并将软件定时器的句柄作为其唯一的参数。清单 72 演示了回调函数原型。</p>
-<pre class=" language-c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">ATimerCallback</span><span class="token punctuation">(</span> TimerHandle_t xTimer <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<pre class=" language-lang-c"><code class="language-lang-c">void ATimerCallback( TimerHandle_t xTimer );
 </code></pre>
 <p>清单 72. 软件定时器回调函数原型</p>
 <p>软件定时器回调函数自始至终执行，并以正常方式退出。它们应该保持简短，并且不能进入阻塞状态。</p>
@@ -452,7 +452,7 @@
 </li>
 </ol>
 <p>图38显示了一次性定时器和自动重载定时器之间的行为差异。虚线垂直线标记滴答中断发生的时间。</p>
-<p><img src="/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240330161114285.png" alt="图38一次性软件定时器和自动重载软件定时器之间的行为差异"></p>
+<p><img src="image-20240330161114285.png" alt="图38一次性软件定时器和自动重载软件定时器之间的行为差异"></p>
 <p>参考图38：</p>
 <ul>
 <li><p>定时器 1 </p>
@@ -473,8 +473,8 @@
 </ul>
 <p>图39和图40分别显示了自动重载定时器和一次性定时器在休眠状态和运行状态之间的可能的转换。这两个图的关键区别在于定时器到期后进入的状态；自动重载定时器执行其回调函数，然后重新进入运行状态，一次性定时器执行其回调函数，然后进入休眠状态。</p>
 <p>xTimerDelete() API 函数的作用是：删除一个定时器。可以随时删除定时器。</p>
-<p><img src="/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240615012641295.png" alt="图 39 自动重载软件定时器状态和转换"></p>
-<p><img src="/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240330163007600.png" alt="图 40 一次性软件定时器状态和转换"></p>
+<p><img src="image-20240615012641295.png" alt="图 39 自动重载软件定时器状态和转换"></p>
+<p><img src="image-20240330163007600.png" alt="图 40 一次性软件定时器状态和转换"></p>
 <h2 id="软件定时器的上下文"><a href="#软件定时器的上下文" class="headerlink" title="软件定时器的上下文"></a>软件定时器的上下文</h2><h3 id="RTOS守护进程-定时器服务-任务"><a href="#RTOS守护进程-定时器服务-任务" class="headerlink" title="RTOS守护进程(定时器服务)任务"></a><strong>RTOS守护进程(定时器服务)任务</strong></h3><p>所有软件定时器回调函数都在同一 RTOS <code>守护进程任务-daemon task</code> (或 <code>“定时器服务任务-timer service task”</code> ) 的上下文中执行[1]。</p>
 <blockquote>
 <p>[1] 该任务过去被称为 “定时器服务任务” ，因为最初它只用于执行软件定时器回调函数。现在同一任务也用于其他目的，因此它被称为 “RTOS守护进程任务” 的更一般的名称。</p>
@@ -484,17 +484,16 @@
 <p>软件定时器回调函数不得调用会导致调用任务进入阻塞状态的 FreeRTOS API 函数，因为这样做将导致守护进程任务进入阻塞状态。</p>
 <h3 id="定时器命令队列"><a href="#定时器命令队列" class="headerlink" title="定时器命令队列"></a><strong>定时器命令队列</strong></h3><p>软件定时器 API 函数将命令从调用任务发送到称为 “定时器命令队列” 的队列上的守护进程任务。这如图 41 所示。命令的示例包括 <code>"start a timer (启动定时器)"</code> 、<code>stop a timer (停止定时器)</code> 和 <code>reset a timer (重置定时器)</code> 。</p>
 <p>定时器命令队列是在启动调度程序时自动创建的标准 FreeRTOS 队列。定时器命令队列的长度由 <code>FreeRTOSConfig.h</code> 中的 <code>configTIMER_QUEUE_LENGTH</code> 编译时配置常量设置。</p>
-<p><img src="/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240330165153654.png" alt="图 41 软件定时器API函数使用定时器命令队列与RTOS守护进程任务通信"></p>
+<p><img src="image-20240330165153654.png" alt="图 41 软件定时器API函数使用定时器命令队列与RTOS守护进程任务通信"></p>
 <h3 id="守护进程任务调度"><a href="#守护进程任务调度" class="headerlink" title="守护进程任务调度"></a><strong>守护进程任务调度</strong></h3><p>守护进程任务与任何其他 FreeRTOS 任务一样进行调度；当守护进程任务是能够运行的最高优先级任务时，它只会处理命令或执行定时器回调函数。图 42 和图 43 演示了 <code>configTIMER_TASK_PRIORITY</code> 设置如何影响执行模式</p>
 <p>图 42 显示了当守护进程任务的优先级低于调用 <code>xTimerStart()</code> API 函数的任务的优先级时的执行模式</p>
-<p><img src="/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240330170229111.png" alt="图 42 调用xTimerStart()的任务的优先级高于守护进程任务的优先级时的执行模式"></p>
+<p><img src="image-20240330170229111.png" alt="图 42 调用xTimerStart()的任务的优先级高于守护进程任务的优先级时的执行模式"></p>
 <p>参照图 42 ，其中任务1 的优先级高于守护进程任务的优先级，并且守护进程任务的优先级高于空闲任务的优先级：</p>
 <ol>
-<li>t1 时刻</li>
-</ol>
-<p>   任务1 处于运行状态，守护进程任务处于阻塞状态。</p>
-<p>   如果有命令发送到定时器命令队列，守护进程任务将离开阻塞状态，在这种情况下，它将处理该命令，或者如果软件定时器到期，在这种情况下，它将执行软件定时器的回调函数。</p>
-<ol start="2">
+<li><p>t1 时刻 </p>
+<p>任务1 处于运行状态，守护进程任务处于阻塞状态。</p>
+<p>如果有命令发送到定时器命令队列，守护进程任务将离开阻塞状态，在这种情况下，它将处理该命令，或者如果软件定时器到期，在这种情况下，它将执行软件定时器的回调函数。</p>
+</li>
 <li><p>t2 时刻：</p>
 <p>任务1 调用 <code>xTimerStart()</code> 。</p>
 <p><code>xTimerStart()</code> 向定时器命令队列发送命令，使守护进程任务离开阻塞状态。 任务1 的优先级高于守护进程任务的优先级，因此守护进程任务不会抢占任务1 。 </p>
@@ -514,7 +513,7 @@
 </li>
 </ol>
 <p>图 43 显示了类似于图 42 所示的场景，但是这一次守护进程任务的优先级高于调用 <code>xTimerStart()</code> 的任务的优先级。</p>
-<p><img src="/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240331001216768.png" alt="图 43 当调用xTimerStart()的任务的优先级低于守护进程任务的优先级时的执行模式"></p>
+<p><img src="image-20240331001216768.png" alt="图 43 当调用xTimerStart()的任务的优先级低于守护进程任务的优先级时的执行模式"></p>
 <p>参照图 43 ，其中守护进程任务的优先级高于任务1 的优先级，任务1 的优先级高于空闲任务的优先级：</p>
 <ol>
 <li><p>t1 时刻 </p>
@@ -541,14 +540,15 @@
 <h2 id="创建和开始一个软件定时器"><a href="#创建和开始一个软件定时器" class="headerlink" title="创建和开始一个软件定时器"></a>创建和开始一个软件定时器</h2><h3 id="xTimerCreate-API函数"><a href="#xTimerCreate-API函数" class="headerlink" title="xTimerCreate()API函数"></a>xTimerCreate()API函数</h3><p>FreeRTOS V9.0.0还包含 <code>xTimerCreateStatic()</code> 函数，该函数在编译时静态分配创建定时器所需的内存: 软件定时器必须先显式创建，然后才能使用。</p>
 <p>软件定时器由 <code>TimerHandle_t</code> 类型的变量引用。<code>xTimerCreate()</code> 用于创建软件定时器，并返回 <code>TimerHandle_t</code> 以引用其创建的软件定时器。软件定时器是在休眠状态下创建的。</p>
 <p>可以在调度器运行之前创建软件定时器，也可以在调度器启动后从任务创建软件定时器。第 0 节介绍了使用的数据类型和命名约定。</p>
-<pre class=" language-c"><code class="language-c">TimerHandle_t <span class="token function">xTimerCreate</span><span class="token punctuation">(</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span> <span class="token keyword">const</span> pcTimerName<span class="token punctuation">,</span> 
-                                TickType_t xTimerPeriodInTicks<span class="token punctuation">,</span> 
-                                UBaseType_t uxAutoReload<span class="token punctuation">,</span> 
-                                <span class="token keyword">void</span> <span class="token operator">*</span> pvTimerID<span class="token punctuation">,</span> 
-                                TimerCallbackFunction_t pxCallbackFunction <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<pre class=" language-lang-c"><code class="language-lang-c">TimerHandle_t xTimerCreate( const char * const pcTimerName, 
+                                TickType_t xTimerPeriodInTicks, 
+                                UBaseType_t uxAutoReload, 
+                                void * pvTimerID, 
+                                TimerCallbackFunction_t pxCallbackFunction );
 </code></pre>
 <p>清单 73 . xTimerCreate()API函数原型</p>
 <p>表 27 . xTimerCreate()参数和返回值</p>
+<div class="table-container">
 <table>
 <thead>
 <tr>
@@ -556,7 +556,8 @@
 <th>描述</th>
 </tr>
 </thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>pcTimerName</td>
 <td>计时器的描述性名称。FreeRTOS 不会以任何方式使用它。它纯粹是作为调试辅助工具而包含的。使用人类可读的名称标识计时器比尝试通过其句柄标识要简单得多。</td>
 </tr>
@@ -580,16 +581,19 @@
 <td>返回值</td>
 <td>如果返回 NULL ，则无法创建软件定时器，因为 FreeRTOS 没有足够的堆内存来分配必要的数据结构。<br>返回的非 NULL 值表示软件定时器已成功创建。返回值是创建的计时器的句柄。<br> 第2章提供了有关堆内存管理的更多信息。</td>
 </tr>
-</tbody></table>
+</tbody>
+</table>
+</div>
 <h3 id="xTimerStart-API函数"><a href="#xTimerStart-API函数" class="headerlink" title="xTimerStart()API函数"></a>xTimerStart()API函数</h3><p><code>xTimerStart()</code> 用于启动处于休眠状态的软件定时器，或重置(重新启动)处于运行状态的软件定时器。<code>xTimerStop()</code> 用于停止处于运行状态的软件定时器。停止软件定时器等同于与将定时器转换到休眠状态。</p>
 <p>可以在调度程序启动之前调用 <code>xTimerStart()</code> ，但是当这样做时，软件定时器直到调度程序启动时才会实际启动。</p>
 <blockquote>
 <p>注意：切勿从中断服务例程调用 <code>xTimerStart()</code> 。应该使用中断安全版本 <code>xTimerStartFromISR()</code> 来代替它。</p>
 </blockquote>
-<pre class=" language-c"><code class="language-c">BaseType_t <span class="token function">xTimerStart</span><span class="token punctuation">(</span> TimerHandle_t xTimer<span class="token punctuation">,</span> TickType_t xTicksToWait <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<pre class=" language-lang-c"><code class="language-lang-c">BaseType_t xTimerStart( TimerHandle_t xTimer, TickType_t xTicksToWait );
 </code></pre>
 <p>清单 74 . xTimerStart()API函数原型</p>
 <p>表 28 . xTimerStart()参数和返回值</p>
+<div class="table-container">
 <table>
 <thead>
 <tr>
@@ -597,209 +601,220 @@
 <th>描述</th>
 </tr>
 </thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>xTimer</td>
 <td>正在启动或重置的软件定时器的句柄。句柄将从用于创建软件计时器的 <code>xTimerCreate()</code> 调用中返回。</td>
 </tr>
 <tr>
 <td>xTicksToWait</td>
-<td><code>xTimerStart()</code> 使用定时器命令队列向守护程序任务发送 “启动计时器” 命令。<br><code> xTicksToWait</code> 指定如果队列已满，调用任务应保持在阻塞状态以等待定时器命令队列上的空间变为可用的最长时间。<br>如果 <code>xTicksToWait</code> 为零且定时器命令队列已满，则 <code>xTimerStart()</code> 将立即返回。<br>阻塞时间以滴答周期指定，因此它表示的绝对时间取决于滴答频率。宏 <code>pdMS_TO_TICKS()</code> 可用于将以毫秒为单位的时间转换为以滴答为单位的时间。<br>如果 <code>FreeRTOSConfig.h</code> 中的 <code>include_vTaskSuspend</code> 设置为 1，则。将 <code>xTicksToWait</code> 设置为 <code>portMAX_DELAY</code> 将导致调用任务无限期地保持在阻塞状态(没有超时期限)，以等待定时器命令队列中的空间变得可用。<br>如果在调度程序启动之前调用 <code>xTimerStart()</code>，则会忽略 <code>xTicksToWait</code> 的值，并且 <code>xTimerStart()</code>的行为与将 <code>xTicksToWait</code> 设置为零时一样。</td>
+<td><code>xTimerStart()</code> 使用定时器命令队列向守护程序任务发送 “启动计时器” 命令。<br><code>xTicksToWait</code> 指定如果队列已满，调用任务应保持在阻塞状态以等待定时器命令队列上的空间变为可用的最长时间。<br>如果 <code>xTicksToWait</code> 为零且定时器命令队列已满，则 <code>xTimerStart()</code> 将立即返回。<br>阻塞时间以滴答周期指定，因此它表示的绝对时间取决于滴答频率。宏 <code>pdMS_TO_TICKS()</code> 可用于将以毫秒为单位的时间转换为以滴答为单位的时间。<br>如果 <code>FreeRTOSConfig.h</code> 中的 <code>include_vTaskSuspend</code> 设置为 1，则。将 <code>xTicksToWait</code> 设置为 <code>portMAX_DELAY</code> 将导致调用任务无限期地保持在阻塞状态(没有超时期限)，以等待定时器命令队列中的空间变得可用。<br>如果在调度程序启动之前调用 <code>xTimerStart()</code>，则会忽略 <code>xTicksToWait</code> 的值，并且 <code>xTimerStart()</code>的行为与将 <code>xTicksToWait</code> 设置为零时一样。</td>
 </tr>
 <tr>
 <td>返回值</td>
 <td>有两个可能的返回值<br>1.  <code>pdPASS</code><br>只有当 “启动定时器” 命令成功发送到定时器命令队列时，才会返回 <code>pdPASS</code>。<br>如果守护进程任务的优先级高于调用 <code>xTimerStart()</code> 的任务的优先级，那么调度程序将确保在 <code>xTimerStart()</code> 返回之前处理启动命令。这是因为一旦定时器命令队列中有数据，守护进程任务就会抢占调用 <code>TimerStart()</code>的任务。<br>如果指定了阻塞时间( <code>xTicksToWait</code> 不为零)，则在函数返回之前，调用任务可能被置于阻塞状态，以等待定时器命令队列中的空间变为可用，但在阻塞时间到期之前，数据已成功写入定时器命令队列。<br>2. <code>pdFALSE</code><br>如果由于队列已满而无法将 “启动定时器” 命令写入定时器命令队列，则将返回 <code>pdFALSE</code>。<br>如果指定了阻塞时间( <code>xTicksToWait</code> 不是零)，则调用任务将被置于阻塞状态，以等待守护进程任务在定时器命令队列中腾出空间，但指定的阻塞时间在此之前已到期。</td>
 </tr>
-</tbody></table>
+</tbody>
+</table>
+</div>
 <h3 id="示例-13-创建一次性和自动重载计时器"><a href="#示例-13-创建一次性和自动重载计时器" class="headerlink" title="示例 13. 创建一次性和自动重载计时器"></a>示例 13. 创建一次性和自动重载计时器</h3><p>此示例创建并启动一个一次性定时器和一个自动重载定时器 - 如清单 75 所示。</p>
-<pre class=" language-c"><code class="language-c"><span class="token comment" spellcheck="true">/* 分配给一次性和自动重载定时器的周期分别为3.333秒和半秒。 */</span> 
-<span class="token macro property">#<span class="token directive keyword">define</span> mainONE_SHOT_TIMER_PERIOD pdMS_TO_TICKS( 3333 )</span>
-<span class="token macro property">#<span class="token directive keyword">define</span> mainAUTO_RELOAD_TIMER_PERIOD pdMS_TO_TICKS( 500 ) </span>
-<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span> <span class="token keyword">void</span> <span class="token punctuation">)</span>
- <span class="token punctuation">{</span>
- TimerHandle_t xAutoReloadTimer<span class="token punctuation">,</span> xOneShotTimer<span class="token punctuation">;</span>
- BaseType_t xTimer1Started<span class="token punctuation">,</span> xTimer2Started<span class="token punctuation">;</span>
-    <span class="token comment" spellcheck="true">/* 创建一次性定时器，将创建的定时器的句柄存储在 xOneShotTimer 中。*/</span>  
-    xOneShotTimer <span class="token operator">=</span> <span class="token function">xTimerCreate</span><span class="token punctuation">(</span> 
-    <span class="token comment" spellcheck="true">/* 软件定时器的文本名称-未由 FreeRTOS 使用。*/</span>
-    <span class="token string">"OneShot"</span><span class="token punctuation">,</span>
-    <span class="token comment" spellcheck="true">/*软件定时器的周期(以滴答为单位)。*/</span>
-    mainONE_SHOT_TIMER_PERIOD<span class="token punctuation">,</span>
-    <span class="token comment" spellcheck="true">/* 将 uxAutoRealod 设置为 pdFALSE 将创建一次性软件定时器。*/</span>
-    pdFALSE<span class="token punctuation">,</span>
-    <span class="token comment" spellcheck="true">/* 此示例不使用定时器 ID。*/</span>
-    <span class="token number">0</span><span class="token punctuation">,</span>
-    <span class="token comment" spellcheck="true">/* 要由正在创建的软件定时器使用的回调函数。*/</span>
-    prvOneShotTimerCallback <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<pre class=" language-lang-c"><code class="language-lang-c">/* 分配给一次性和自动重载定时器的周期分别为3.333秒和半秒。 */ 
+#define mainONE_SHOT_TIMER_PERIOD pdMS_TO_TICKS( 3333 )
+#define mainAUTO_RELOAD_TIMER_PERIOD pdMS_TO_TICKS( 500 ) 
+int main( void )
+ {
+ TimerHandle_t xAutoReloadTimer, xOneShotTimer;
+ BaseType_t xTimer1Started, xTimer2Started;
+    /* 创建一次性定时器，将创建的定时器的句柄存储在 xOneShotTimer 中。*/  
+    xOneShotTimer = xTimerCreate( 
+    /* 软件定时器的文本名称-未由 FreeRTOS 使用。*/
+    "OneShot",
+    /*软件定时器的周期(以滴答为单位)。*/
+    mainONE_SHOT_TIMER_PERIOD,
+    /* 将 uxAutoRealod 设置为 pdFALSE 将创建一次性软件定时器。*/
+    pdFALSE,
+    /* 此示例不使用定时器 ID。*/
+    0,
+    /* 要由正在创建的软件定时器使用的回调函数。*/
+    prvOneShotTimerCallback );
 
-    <span class="token comment" spellcheck="true">/* 创建自动重载定时器，将创建的定时器的句柄存储在 xAutoReloadTimer 中。*/</span> 
-    xAutoReloadTimer <span class="token operator">=</span> <span class="token function">xTimerCreate</span><span class="token punctuation">(</span> 
-    <span class="token comment" spellcheck="true">/* 软件定时器的文本名称-未由 FreeRTOS 使用。 */</span>
-    <span class="token string">"AutoReload"</span><span class="token punctuation">,</span>
-    <span class="token comment" spellcheck="true">/* 软件定时器的周期(以滴答为单位)。*/</span>
-    mainAUTO_RELOAD_TIMER_PERIOD<span class="token punctuation">,</span>
-    <span class="token comment" spellcheck="true">/* 将 uxAutoRealod 设置为 pdTRUE 将创建自动重载定时器。*/</span>
-    pdTRUE<span class="token punctuation">,</span> 
-    <span class="token comment" spellcheck="true">/* 此示例不使用定时器 ID。 */</span>
-    <span class="token number">0</span><span class="token punctuation">,</span>
-    <span class="token comment" spellcheck="true">/* 要由正在创建的软件定时器使用的回调函数。*/</span>
-    prvAutoReloadTimerCallback <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    /* 创建自动重载定时器，将创建的定时器的句柄存储在 xAutoReloadTimer 中。*/ 
+    xAutoReloadTimer = xTimerCreate( 
+    /* 软件定时器的文本名称-未由 FreeRTOS 使用。 */
+    "AutoReload",
+    /* 软件定时器的周期(以滴答为单位)。*/
+    mainAUTO_RELOAD_TIMER_PERIOD,
+    /* 将 uxAutoRealod 设置为 pdTRUE 将创建自动重载定时器。*/
+    pdTRUE, 
+    /* 此示例不使用定时器 ID。 */
+    0,
+    /* 要由正在创建的软件定时器使用的回调函数。*/
+    prvAutoReloadTimerCallback );
 
-    <span class="token comment" spellcheck="true">/* 检查软件定时器是否已创建。*/</span>
-    <span class="token keyword">if</span><span class="token punctuation">(</span> <span class="token punctuation">(</span> xOneShotTimer <span class="token operator">!=</span> <span class="token constant">NULL</span> <span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>xAutoReloadTimer <span class="token operator">!=</span> <span class="token constant">NULL</span> <span class="token punctuation">)</span> <span class="token punctuation">)</span> 
-    <span class="token punctuation">{</span>
-    <span class="token comment" spellcheck="true">/* 阻塞时间设为 0 (无阻塞时间) 启动软件定时器。调度程序尚未启动，因此此处指定的任何阻塞时间都将被忽略。
- */</span>
-    xTimer1Started <span class="token operator">=</span> <span class="token function">xTimerStart</span><span class="token punctuation">(</span> xOneShotTimer<span class="token punctuation">,</span> <span class="token number">0</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
-    xTimer2Started <span class="token operator">=</span> <span class="token function">xTimerStart</span><span class="token punctuation">(</span> xAutoReloadTimer<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token comment" spellcheck="true">/* xTimerStart() 的实现使用定时器命令队列，如果定时器命令队列已满，xTimerStart() 将失败。守护进程任务在调度程序启动之前不会创建，因此发送到命令队列的所有命令都将保留在队列中，直到调度程序启动之后。检查传递的两个 xTimerStart() 调用。*/</span>
-    <span class="token keyword">if</span><span class="token punctuation">(</span> <span class="token punctuation">(</span> xTimer1Started <span class="token operator">==</span> pdPASS <span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>xTimer2Started <span class="token operator">==</span> pdPASS <span class="token punctuation">)</span> <span class="token punctuation">)</span> 
-    <span class="token punctuation">{</span> <span class="token comment" spellcheck="true">/* Start the scheduler. */</span>
-    <span class="token function">vTaskStartScheduler</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-    <span class="token punctuation">}</span>
-  <span class="token punctuation">}</span> 
-    <span class="token comment" spellcheck="true">/*一如既往，这条线不应该达到。 */</span> 
-    <span class="token keyword">for</span><span class="token punctuation">(</span> <span class="token punctuation">;</span><span class="token punctuation">;</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+    /* 检查软件定时器是否已创建。*/
+    if( ( xOneShotTimer != NULL ) && (xAutoReloadTimer != NULL ) ) 
+    {
+    /* 阻塞时间设为 0 (无阻塞时间) 启动软件定时器。调度程序尚未启动，因此此处指定的任何阻塞时间都将被忽略。
+ */
+    xTimer1Started = xTimerStart( xOneShotTimer, 0 );
+    xTimer2Started = xTimerStart( xAutoReloadTimer, 0);
+    /* xTimerStart() 的实现使用定时器命令队列，如果定时器命令队列已满，xTimerStart() 将失败。守护进程任务在调度程序启动之前不会创建，因此发送到命令队列的所有命令都将保留在队列中，直到调度程序启动之后。检查传递的两个 xTimerStart() 调用。*/
+    if( ( xTimer1Started == pdPASS ) && (xTimer2Started == pdPASS ) ) 
+    { /* Start the scheduler. */
+    vTaskStartScheduler(); 
+    }
+  } 
+    /*一如既往，这条线不应该达到。 */ 
+    for( ;; );
+}
 </code></pre>
 <p>清单 75.  创建并启动示例 13 中使用的定时器</p>
 <p>定时器的回调函数在每次被调用时只打印一条消息。清单 76 中显示了一次性定时器回调函数的实现。自动重载定时器回调函数的实现如清单 77 所示。</p>
-<pre class=" language-c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">prvOneShotTimerCallback</span><span class="token punctuation">(</span> TimerHandle_t xTimer <span class="token punctuation">)</span>
-<span class="token punctuation">{</span>
-    TickType_t xTimeNow<span class="token punctuation">;</span>
-    <span class="token comment" spellcheck="true">/* 获取当前的滴答计数。 */</span>
-    xTimeNow <span class="token operator">=</span> <span class="token function">xTaskGetTickCount</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<pre class=" language-lang-c"><code class="language-lang-c">static void prvOneShotTimerCallback( TimerHandle_t xTimer )
+{
+    TickType_t xTimeNow;
+    /* 获取当前的滴答计数。 */
+    xTimeNow = xTaskGetTickCount();
 
-    <span class="token comment" spellcheck="true">/* 输出一个字符串以显示执行回调的时间*/</span>
-    <span class="token function">vPrintStringAndNumber</span><span class="token punctuation">(</span> <span class="token string">"One-shot timer callback executing"</span><span class="token punctuation">,</span> xTimeNow <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    /* 输出一个字符串以显示执行回调的时间*/
+    vPrintStringAndNumber( "One-shot timer callback executing", xTimeNow );
 
-    <span class="token comment" spellcheck="true">/* 文件作用域变量。(全局变量) */</span>
-    ulCallCount<span class="token operator">++</span><span class="token punctuation">;</span>
- <span class="token punctuation">}</span>
+    /* 文件作用域变量。(全局变量) */
+    ulCallCount++;
+ }
 </code></pre>
 <p>清单 76.  示例 13 中的一次性定时器使用的回调函数</p>
-<pre class=" language-c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">prvAutoReloadTimerCallback</span><span class="token punctuation">(</span> TimerHandle_t xTimer <span class="token punctuation">)</span>
-<span class="token punctuation">{</span>
-TickType_t xTimeNow<span class="token punctuation">;</span>
-    <span class="token comment" spellcheck="true">/* 获取当前的滴答计数。 */</span>
-    xTimeNow <span class="token operator">=</span> <span class="token function">uxTaskGetTickCount</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<pre class=" language-lang-c"><code class="language-lang-c">static void prvAutoReloadTimerCallback( TimerHandle_t xTimer )
+{
+TickType_t xTimeNow;
+    /* 获取当前的滴答计数。 */
+    xTimeNow = uxTaskGetTickCount();
 
-     <span class="token comment" spellcheck="true">/* 输出一个字符串以显示执行回调的时间*/</span>
-   <span class="token function">vPrintStringAndNumber</span><span class="token punctuation">(</span> <span class="token string">"Auto-reload timer callback executing"</span><span class="token punctuation">,</span> xTimeNow <span class="token punctuation">)</span><span class="token punctuation">;</span>
+     /* 输出一个字符串以显示执行回调的时间*/
+   vPrintStringAndNumber( "Auto-reload timer callback executing", xTimeNow );
 
-  ulCallCount<span class="token operator">++</span><span class="token punctuation">;</span>
- <span class="token punctuation">}</span>
+  ulCallCount++;
+ }
 </code></pre>
 <p>清单 77.  示例 13 中的自动重载定时器使用的回调函数</p>
 <p>执行此示例将生成如图 44 所示的输出。图 44 显示了自动重载定时器的回调函数以500个滴答的固定周期执行 (清单 75 中的 <code>mainAUTO_RELOAD_TIMER_PERIOD</code> 设置为 500 )，当滴答计数为 3333 时，一次性定时器的回调函数只执行一次 (清单 75 中的 <code>mainOne_Shot_Timer_Period</code> 设置为 3333 )。</p>
-<p><img src="/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240331225428946.png" alt="图 44 执行示例 13 时产生的输出"></p>
+<p><img src="image-20240331225428946.png" alt="图 44 执行示例 13 时产生的输出"></p>
 <h2 id="定时器-ID"><a href="#定时器-ID" class="headerlink" title="定时器 ID"></a>定时器 ID</h2><p>每个软件定时器都有一个 ID，它是应用程序编写者可以出于任何目的使用的标记值。ID 存储在空指针 <code>(void*)</code> 中，因此可以直接存储整数值、指向任何其他对象或用作函数指针。</p>
-<p>创建软件定时器时会为ID分配初始值 — 之后可以使用 <code>vTimerSetTimerID()</code> API函数更新 ID，并使用 <code>pvTimerGetTimerID()</code> API函数进行查询。</p>
-<p>与其他软件定时器 API 函数不同，<code>vTimerSetTimerID()</code> 和 <code>pvTimerGetTimerID()</code> 直接访问软件定时器 — 它们不向定时器命令队列发送命令。</p>
-<h3 id="vTimerSetTimerID-API函数"><a href="#vTimerSetTimerID-API函数" class="headerlink" title="vTimerSetTimerID()API函数"></a><strong>vTimerSetTimerID()API函数</strong></h3><pre class=" language-c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">vTimerSetTimerID</span><span class="token punctuation">(</span> <span class="token keyword">const</span> TimerHandle_t xTimer<span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span>pvNewID <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<p>创建软件定时器时会为ID分配初始值 —- 之后可以使用 <code>vTimerSetTimerID()</code> API函数更新 ID，并使用 <code>pvTimerGetTimerID()</code> API函数进行查询。</p>
+<p>与其他软件定时器 API 函数不同，<code>vTimerSetTimerID()</code> 和 <code>pvTimerGetTimerID()</code> 直接访问软件定时器 —- 它们不向定时器命令队列发送命令。</p>
+<h3 id="vTimerSetTimerID-API函数"><a href="#vTimerSetTimerID-API函数" class="headerlink" title="vTimerSetTimerID()API函数"></a><strong>vTimerSetTimerID()API函数</strong></h3><pre class=" language-lang-c"><code class="language-lang-c">void vTimerSetTimerID( const TimerHandle_t xTimer, void *pvNewID );
 </code></pre>
 <p>清单 78.  vTimerSetTimerID() API 函数原型</p>
 <p><strong>表 29. vTimerSetTimerID() 参数</strong></p>
+<div class="table-container">
 <table>
 <thead>
 <tr>
-<th align="left">参数/返回值</th>
-<th align="left">描述</th>
+<th style="text-align:left">参数/返回值</th>
+<th style="text-align:left">描述</th>
 </tr>
 </thead>
-<tbody><tr>
-<td align="left">xTimer</td>
-<td align="left">使用新 ID 值更新的软件定时器的句柄。 句柄将从用于创建软件定时器的 <code>xTimerCreate()</code> 调用中返回。</td>
+<tbody>
+<tr>
+<td style="text-align:left">xTimer</td>
+<td style="text-align:left">使用新 ID 值更新的软件定时器的句柄。 句柄将从用于创建软件定时器的 <code>xTimerCreate()</code> 调用中返回。</td>
 </tr>
 <tr>
-<td align="left">pvNewID</td>
-<td align="left">软件定时器 ID 将被设为的值。</td>
+<td style="text-align:left">pvNewID</td>
+<td style="text-align:left">软件定时器 ID 将被设为的值。</td>
 </tr>
-</tbody></table>
-<h3 id="pvTimerGetTimerID-API-函数"><a href="#pvTimerGetTimerID-API-函数" class="headerlink" title="pvTimerGetTimerID() API 函数"></a>pvTimerGetTimerID() API 函数</h3><pre class=" language-c"><code class="language-c"><span class="token keyword">void</span> <span class="token operator">*</span><span class="token function">pvTimerGetTimerID</span><span class="token punctuation">(</span> TimerHandle_t xTimer <span class="token punctuation">)</span><span class="token punctuation">;</span>
+</tbody>
+</table>
+</div>
+<h3 id="pvTimerGetTimerID-API-函数"><a href="#pvTimerGetTimerID-API-函数" class="headerlink" title="pvTimerGetTimerID() API 函数"></a>pvTimerGetTimerID() API 函数</h3><pre class=" language-lang-c"><code class="language-lang-c">void *pvTimerGetTimerID( TimerHandle_t xTimer );
 </code></pre>
 <p>清单 79. pvTimerGetTimerID() API 函数原型</p>
 <p>表 30.  pvTimerGetTimerID() 参数和返回值</p>
+<div class="table-container">
 <table>
 <thead>
 <tr>
-<th align="left">参数/返回值</th>
-<th align="left">描述</th>
+<th style="text-align:left">参数/返回值</th>
+<th style="text-align:left">描述</th>
 </tr>
 </thead>
-<tbody><tr>
-<td align="left">xTimer</td>
-<td align="left">查询的软件定时器的句柄。句柄将从用于创建软件定时器的 <code>xTimerCreate()</code> 调用中返回。</td>
+<tbody>
+<tr>
+<td style="text-align:left">xTimer</td>
+<td style="text-align:left">查询的软件定时器的句柄。句柄将从用于创建软件定时器的 <code>xTimerCreate()</code> 调用中返回。</td>
 </tr>
 <tr>
-<td align="left">返回值</td>
-<td align="left">查询的软件定时器的 ID。</td>
+<td style="text-align:left">返回值</td>
+<td style="text-align:left">查询的软件定时器的 ID。</td>
 </tr>
-</tbody></table>
+</tbody>
+</table>
+</div>
 <h3 id="示例-14-使用回调函数参数和软件定时器ID"><a href="#示例-14-使用回调函数参数和软件定时器ID" class="headerlink" title="示例 14. 使用回调函数参数和软件定时器ID"></a>示例 14. 使用回调函数参数和软件定时器ID</h3><p>可以将相同的回调函数分配给多个软件定时器。完成后，回调函数参数用于确定哪个软件定时器已到期。</p>
 <p>示例 13 使用了两个单独的回调函数；一个回调函数由一次性定时器使用，另一个回调函数由自动重载定时器使用。示例 14 创建与示例 13 创建的功能类似的功能，但将单个回调函数分配给两个软件定时器。</p>
 <p>示例 14 使用的 main() 函数与示例 13 使用的 main() 函数几乎相同，唯一的区别是创建软件定时器的位置。清单 80 显示了这种差异，其中 <code>prvTimerCallback()</code> 用作两个定时器的回调函数。</p>
-<pre class=" language-c"><code class="language-c"><span class="token comment" spellcheck="true">/* 创建一次定时器软件定时器，将句柄存储在 xOneShotTimer 中。*/</span>
-xOneShotTimer <span class="token operator">=</span> <span class="token function">xTimerCreate</span><span class="token punctuation">(</span> <span class="token string">"OneShot"</span><span class="token punctuation">,</span>
-                                          mainONE_SHOT_TIMER_PERIOD<span class="token punctuation">,</span>
-                                          pdFALSE<span class="token punctuation">,</span>
-                                          <span class="token comment" spellcheck="true">/* 定时器ID初始化为0*/</span>
-                                          <span class="token number">0</span><span class="token punctuation">,</span>
-                                         <span class="token comment" spellcheck="true">/* 两个定时器都使用 prvTimerCallback()。*/</span>
-                                         prvTimerCallback <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<pre class=" language-lang-c"><code class="language-lang-c">/* 创建一次定时器软件定时器，将句柄存储在 xOneShotTimer 中。*/
+xOneShotTimer = xTimerCreate( "OneShot",
+                                          mainONE_SHOT_TIMER_PERIOD,
+                                          pdFALSE,
+                                          /* 定时器ID初始化为0*/
+                                          0,
+                                         /* 两个定时器都使用 prvTimerCallback()。*/
+                                         prvTimerCallback );
 
 
-<span class="token comment" spellcheck="true">/* 创建自动重载软件定时器，将句柄存储在 xAutoReloadTimer 中*/</span>
-xAutoReloadTimer <span class="token operator">=</span> <span class="token function">xTimerCreate</span><span class="token punctuation">(</span> <span class="token string">"AutoReload"</span><span class="token punctuation">,</span>
-                                               mainAUTO_RELOAD_TIMER_PERIOD<span class="token punctuation">,</span>
-                                               pdTRUE<span class="token punctuation">,</span>
-                                               <span class="token comment" spellcheck="true">/* 定时器的ID初始化为0。 */</span>
-                                               <span class="token number">0</span><span class="token punctuation">,</span>
-                                               <span class="token comment" spellcheck="true">/* 两个定时器都使用 prvTimerCallback()。*/</span>
-                                               prvTimerCallback <span class="token punctuation">)</span><span class="token punctuation">;</span>
+/* 创建自动重载软件定时器，将句柄存储在 xAutoReloadTimer 中*/
+xAutoReloadTimer = xTimerCreate( "AutoReload",
+                                               mainAUTO_RELOAD_TIMER_PERIOD,
+                                               pdTRUE,
+                                               /* 定时器的ID初始化为0。 */
+                                               0,
+                                               /* 两个定时器都使用 prvTimerCallback()。*/
+                                               prvTimerCallback );
 </code></pre>
 <p>清单 80. 创建示例 14 中使用的定时器</p>
 <p><code>prvTimerCallback()</code> 将在任一定时器到期时执行。<code>prvTimerCallback()</code> 的实现使用函数的参数来确定调用它是因为一次性定时器已到期，还是因为自动重载定时器已到期。</p>
 <p><code>prvTimerCallback()</code> 还演示了如何将软件定时器 ID 用作特定于定时器的存储；每个软件定时器在其自己的 ID 中保存其到期次数的计数，并且自动重载定时器在第五次执行时使用该计数停止自身。</p>
 <p><code>prvTimerCallback()</code> 的实现如清单79所示</p>
-<pre class=" language-c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">prvTimerCallback</span><span class="token punctuation">(</span> TimerHandle_t xTimer <span class="token punctuation">)</span>
-<span class="token punctuation">{</span>
-TickType_t xTimeNow<span class="token punctuation">;</span>
-uint32_t ulExecutionCount<span class="token punctuation">;</span>
+<pre class=" language-lang-c"><code class="language-lang-c">static void prvTimerCallback( TimerHandle_t xTimer )
+{
+TickType_t xTimeNow;
+uint32_t ulExecutionCount;
 
-        <span class="token comment" spellcheck="true">/* 此软件定时器到期次数的计数存储在定时器的 ID 中。获取 ID，将其递增，
-        然后将其另存为新的 ID 值。该 ID 是一个 void 指针，因此被强制转换为 uint32_t。*/</span>
-        ulExecutionCount <span class="token operator">=</span> <span class="token punctuation">(</span> uint32_t <span class="token punctuation">)</span> <span class="token function">pvTimerGetTimerID</span><span class="token punctuation">(</span> xTimer <span class="token punctuation">)</span><span class="token punctuation">;</span>
-        ulExecutionCount<span class="token operator">++</span><span class="token punctuation">;</span>
-        <span class="token function">vTimerSetTimerID</span><span class="token punctuation">(</span> xTimer<span class="token punctuation">,</span> <span class="token punctuation">(</span> <span class="token keyword">void</span> <span class="token operator">*</span> <span class="token punctuation">)</span> ulExecutionCount <span class="token punctuation">)</span><span class="token punctuation">;</span>
+        /* 此软件定时器到期次数的计数存储在定时器的 ID 中。获取 ID，将其递增，
+        然后将其另存为新的 ID 值。该 ID 是一个 void 指针，因此被强制转换为 uint32_t。*/
+        ulExecutionCount = ( uint32_t ) pvTimerGetTimerID( xTimer );
+        ulExecutionCount++;
+        vTimerSetTimerID( xTimer, ( void * ) ulExecutionCount );
 
-        <span class="token comment" spellcheck="true">/*获取当前的计时次数。*/</span>
-        xTimeNow <span class="token operator">=</span> <span class="token function">xTaskGetTickCount</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        /*获取当前的计时次数。*/
+        xTimeNow = xTaskGetTickCount();
 
-        <span class="token comment" spellcheck="true">/*创建定时器时，一次性定时器的句柄存储在 xOneShotTimer 中。将传入此函数的句柄与
+        /*创建定时器时，一次性定时器的句柄存储在 xOneShotTimer 中。将传入此函数的句柄与
         xOneShotTimer 进行比较，以确定是一次性定时器还是自动重载定时器到期，然后输出一个
-        字符串以显示执行回调的时间。*/</span>
-        <span class="token keyword">if</span><span class="token punctuation">(</span> xTimer <span class="token operator">==</span> xOneShotTimer <span class="token punctuation">)</span>
-        <span class="token punctuation">{</span>
-            <span class="token function">vPrintStringAndNumber</span><span class="token punctuation">(</span> <span class="token string">"One-shot timer callback executing"</span><span class="token punctuation">,</span> xTimeNow <span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token punctuation">}</span>
-        <span class="token keyword">else</span>
-        <span class="token punctuation">{</span>
-            <span class="token comment" spellcheck="true">/*xTimer不等于 xOneShotTimer，所以一定是自动重载定时器到期，调用了回掉函数。*/</span>
-            <span class="token function">vPrintStringAndNumber</span><span class="token punctuation">(</span> <span class="token string">"Auto-reload timer callback executing"</span><span class="token punctuation">,</span> xTimeNow <span class="token punctuation">)</span><span class="token punctuation">;</span>
+        字符串以显示执行回调的时间。*/
+        if( xTimer == xOneShotTimer )
+        {
+            vPrintStringAndNumber( "One-shot timer callback executing", xTimeNow );
+        }
+        else
+        {
+            /*xTimer不等于 xOneShotTimer，所以一定是自动重载定时器到期，调用了回掉函数。*/
+            vPrintStringAndNumber( "Auto-reload timer callback executing", xTimeNow );
 
-            <span class="token keyword">if</span><span class="token punctuation">(</span> ulExecutionCount <span class="token operator">==</span> <span class="token number">5</span> <span class="token punctuation">)</span>
-            <span class="token punctuation">{</span>
-                <span class="token comment" spellcheck="true">/*自动重载定时器执行 5 次后停止。此回调函数在 RTOS 守护进程任务的上下文中执行，
-                因此不能调用任何可能将守护进程任务置于阻塞状态的函数。因此，使用阻塞时间 0。*/</span>
+            if( ulExecutionCount == 5 )
+            {
+                /*自动重载定时器执行 5 次后停止。此回调函数在 RTOS 守护进程任务的上下文中执行，
+                因此不能调用任何可能将守护进程任务置于阻塞状态的函数。因此，使用阻塞时间 0。*/
 
-                <span class="token function">xTimerStop</span><span class="token punctuation">(</span> xTimer<span class="token punctuation">,</span> <span class="token number">0</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
-             <span class="token punctuation">}</span>
-        <span class="token punctuation">}</span>
- <span class="token punctuation">}</span>
+                xTimerStop( xTimer, 0 );
+             }
+        }
+ }
 </code></pre>
 <p>清单 81. 示例 14 中使用的定时器回调函数</p>
 <p>示例 14 产生的输出如图 45 所示。可以看到，自动重载定时器只执行了五次。</p>
-<p><img src="/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240401025314788.png" alt="图 45 执行示例 14 时产生的输出"></p>
+<p><img src="image-20240401025314788.png" alt="图 45 执行示例 14 时产生的输出"></p>
 <h2 id="更改定时器的周期"><a href="#更改定时器的周期" class="headerlink" title="更改定时器的周期"></a>更改定时器的周期</h2><p>每个官方 FreeRTOS 移植都提供了一个或多个示例工程。大多数示例项目都是在运行中不断自检，LED用于提供项目状态的可视反馈；如果自检总是通过，则LED缓慢闪烁，如果自检失败，则LED快速闪烁。</p>
 <p>一些示例工程在任务中执行自检，并使用 <code>vTaskDelay()</code> 函数控制LED的翻转速率。其他示例工程在软件定时器回调函数中执行自检，并使用定时器的周期来控制LED的翻转速率。</p>
 <h3 id="xTimerChangePeriod-API函数"><a href="#xTimerChangePeriod-API函数" class="headerlink" title="xTimerChangePeriod()API函数"></a>xTimerChangePeriod()API函数</h3><p>使用 <code>xTimerChangePeriod()</code> 函数更改软件定时器的周期。</p>
@@ -808,12 +823,13 @@ uint32_t ulExecutionCount<span class="token punctuation">;</span>
 <blockquote>
 <p>注意：切勿从中断服务例程调用 <code>xTimerChangePeriod()</code>。应该使用中断安全版本 <code>xTimerChangePerodFromISR()</code> 来代替它。</p>
 </blockquote>
-<pre class=" language-c"><code class="language-c">BaseType_t <span class="token function">xTimerChangePeriod</span><span class="token punctuation">(</span> TimerHandle_t xTimer<span class="token punctuation">,</span>  
-                               TickType_t xNewTimerPeriodInTicks<span class="token punctuation">,</span> 
-                               TickType_t xTicksToWait <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<pre class=" language-lang-c"><code class="language-lang-c">BaseType_t xTimerChangePeriod( TimerHandle_t xTimer,  
+                               TickType_t xNewTimerPeriodInTicks, 
+                               TickType_t xTicksToWait );
 </code></pre>
 <p>清单 82.  xTimerChangePeriod() API 函数原型</p>
 <p>表 31 xTimerChangePeriod() 参数和返回值</p>
+<div class="table-container">
 <table>
 <thead>
 <tr>
@@ -821,7 +837,8 @@ uint32_t ulExecutionCount<span class="token punctuation">;</span>
 <th>描述</th>
 </tr>
 </thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>xTimer</td>
 <td>需要更新的软件定时器的句柄。句柄将从用于创建软件计时器的 <code>xTimerCreate()</code> 调用中返回。</td>
 </tr>
@@ -837,46 +854,48 @@ uint32_t ulExecutionCount<span class="token punctuation">;</span>
 <td>返回值</td>
 <td>有两个可能的返回值 <br>1. <code>pdPASS</code> <br>只有当数据成功发送到定时器命令队列时，才会返回 <code>pdPASS</code>。<br>如果指定了阻塞时间( <code>xTicksToWait</code> 不为零)，则在函数返回之前，调用任务可能被置于阻塞状态，以等待定时器命令队列中的空间变为可用，但在阻塞时间到期之前，数据已成功写入定时器命令队列。<br><code>2. pdFALSE</code> <br>如果由于队列已满而无法将 <code>"Change Period"</code> 命令写入计时器命令队列，则将返回 <code>pdFALSE</code>。<br>如果指定了阻塞时间 ( <code>xTicksToWait</code> 不是零)，则调用任务将被置于阻塞状态，以等待守护进程任务在队列中腾出空间，但指定的阻塞时间在此之前已到期。</td>
 </tr>
-</tbody></table>
-<p>清单 83 展示了包含自检的 FreeRTOS 例程是怎么在软件定时器的回调函数中使用 <code>xTimerChangePeriod()</code> 在自检失败时提高LED闪烁速度的。执行自检的软件定时器被称为 “检查定时器 — check timer”。</p>
-<pre class=" language-c"><code class="language-c"><span class="token comment" spellcheck="true">/* 检查定时器的创建周期为3000毫秒，导致LED每3秒切换一次。如果自检功能检测到意外状态，则检查定时器的周期将更改为仅200毫秒，从而导致更快的翻转速率。*/</span> 
-<span class="token keyword">const</span> TickType_t xHealthyTimerPeriod <span class="token operator">=</span> <span class="token function">pdMS_TO_TICKS</span><span class="token punctuation">(</span> <span class="token number">3000</span> <span class="token punctuation">)</span><span class="token punctuation">;</span> 
-<span class="token keyword">const</span> TickType_t xErrorTimerPeriod <span class="token operator">=</span> <span class="token function">pdMS_TO_TICKS</span><span class="token punctuation">(</span> <span class="token number">200</span> <span class="token punctuation">)</span><span class="token punctuation">;</span> 
+</tbody>
+</table>
+</div>
+<p>清单 83 展示了包含自检的 FreeRTOS 例程是怎么在软件定时器的回调函数中使用 <code>xTimerChangePeriod()</code> 在自检失败时提高LED闪烁速度的。执行自检的软件定时器被称为 “检查定时器 —- check timer”。</p>
+<pre class=" language-lang-c"><code class="language-lang-c">/* 检查定时器的创建周期为3000毫秒，导致LED每3秒切换一次。如果自检功能检测到意外状态，则检查定时器的周期将更改为仅200毫秒，从而导致更快的翻转速率。*/ 
+const TickType_t xHealthyTimerPeriod = pdMS_TO_TICKS( 3000 ); 
+const TickType_t xErrorTimerPeriod = pdMS_TO_TICKS( 200 ); 
 
-<span class="token comment" spellcheck="true">/* 检查定时器使用的回调函数。 */</span> 
-<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">prvCheckTimerCallbackFunction</span><span class="token punctuation">(</span> TimerHandle_t xTimer <span class="token punctuation">)</span> 
-<span class="token punctuation">{</span> 
-<span class="token keyword">static</span> BaseType_t xErrorDetected <span class="token operator">=</span> pdFALSE<span class="token punctuation">;</span> 
+/* 检查定时器使用的回调函数。 */ 
+static void prvCheckTimerCallbackFunction( TimerHandle_t xTimer ) 
+{ 
+static BaseType_t xErrorDetected = pdFALSE; 
 
-    <span class="token keyword">if</span><span class="token punctuation">(</span> xErrorDetected <span class="token operator">==</span> pdFALSE <span class="token punctuation">)</span> 
-    <span class="token punctuation">{</span> 
-        <span class="token comment" spellcheck="true">/* 尚未检测到任何错误。再次运行自检功能。该函数要求示例创建的每个任务
-        报告自己的状态，并检查所有任务是否实际上仍在运行(因此能够正确报告其状态)。*/</span> 
-        <span class="token keyword">if</span><span class="token punctuation">(</span> <span class="token function">CheckTasksAreRunningWithoutError</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> pdFAIL <span class="token punctuation">)</span> 
-        <span class="token punctuation">{</span> 
-            <span class="token comment" spellcheck="true">/*一个或多个任务报告意外状态，可能发生了错误。
+    if( xErrorDetected == pdFALSE ) 
+    { 
+        /* 尚未检测到任何错误。再次运行自检功能。该函数要求示例创建的每个任务
+        报告自己的状态，并检查所有任务是否实际上仍在运行(因此能够正确报告其状态)。*/ 
+        if( CheckTasksAreRunningWithoutError() == pdFAIL ) 
+        { 
+            /*一个或多个任务报告意外状态，可能发生了错误。
             减少检查定时器的周期以提高此回调函数的执行速率，这样做还可以提高 LED 的切换速率。
             此回调函数在 RTOS 守护进程任务的上下文中执行，因此使用阻塞时间 0 来确保守护进程任务永
-            远不会进入阻塞状态。*/</span> 
-            <span class="token function">xTimerChangePeriod</span><span class="token punctuation">(</span> xTimer<span class="token punctuation">,</span>            <span class="token comment" spellcheck="true">/* 正要更新的定时器。*/</span> 
-                                xErrorTimerPeriod<span class="token punctuation">,</span> <span class="token comment" spellcheck="true">/* 定时器的新周期*/</span> 
-                                <span class="token number">0</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>               <span class="token comment" spellcheck="true">/* 发送此命令时不要阻塞。 */</span> 
-        <span class="token punctuation">}</span> 
+            远不会进入阻塞状态。*/ 
+            xTimerChangePeriod( xTimer,            /* 正要更新的定时器。*/ 
+                                xErrorTimerPeriod, /* 定时器的新周期*/ 
+                                0 );               /* 发送此命令时不要阻塞。 */ 
+        } 
 
-        <span class="token comment" spellcheck="true">/* 锁定已检测到错误。 */</span> 
-        xErrorDetected <span class="token operator">=</span> pdTRUE<span class="token punctuation">;</span> 
-    <span class="token punctuation">}</span> 
+        /* 锁定已检测到错误。 */ 
+        xErrorDetected = pdTRUE; 
+    } 
 
-    <span class="token comment" spellcheck="true">/* 切换 LED。LED 翻转的速率取决于调用此函数的频率，
+    /* 切换 LED。LED 翻转的速率取决于调用此函数的频率，
     该频率由检查定时器的周期确定。如果
     CheckTasksAreRunningWithoutError() 曾经返回 pdFAIL，
-    则定时器的周期将从 3000ms 减少到 200ms。*/</span> 
-    <span class="token function">ToggleLED</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-<span class="token punctuation">}</span>
+    则定时器的周期将从 3000ms 减少到 200ms。*/ 
+    ToggleLED(); 
+}
 </code></pre>
 <p>清单 83. 使用 xTimerChangePeriod()</p>
 <h2 id="重置一个定时器"><a href="#重置一个定时器" class="headerlink" title="重置一个定时器"></a>重置一个定时器</h2><p>重置软件定时器意味着重新启动定时器；计时器的到期时间将根据重置计时器的时间重新计算，而不是相对于计时器最初启动的时间。图 46 演示了这一点，它显示了一个以 6 为周期启动的定时器，然后重置两次，最后到期并执行其回调函数。</p>
-<p><img src="/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240401041311370.png" alt="图 46. 启动和重置周期为 6 个滴答的软件定时器"></p>
+<p><img src="image-20240401041311370.png" alt="图 46. 启动和重置周期为 6 个滴答的软件定时器"></p>
 <p>参考图 46：</p>
 <ul>
 <li>定时器 1 在 t1 时刻启动。它的周期为 6，因此它执行回调函数的时间最初计算为 t7，即启动后的 6 个滴答。</li>
@@ -889,10 +908,11 @@ uint32_t ulExecutionCount<span class="token punctuation">;</span>
 <blockquote>
 <p>注意：切勿从中断服务例程调用 <code>xTimerReset()</code>。应该使用中断安全版本 <code>xTimerResetFromISR()</code> 来代替它。</p>
 </blockquote>
-<pre class=" language-c"><code class="language-c">BaseType_t <span class="token function">xTimerReset</span><span class="token punctuation">(</span> TimerHandle_t xTimer<span class="token punctuation">,</span> TickType_t xTicksToWait <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<pre class=" language-lang-c"><code class="language-lang-c">BaseType_t xTimerReset( TimerHandle_t xTimer, TickType_t xTicksToWait );
 </code></pre>
 <p>清单 84. xTimerReset() API 函数原型</p>
 <p>表 32. xTimerReset()参数和返回值</p>
+<div class="table-container">
 <table>
 <thead>
 <tr>
@@ -900,7 +920,8 @@ uint32_t ulExecutionCount<span class="token punctuation">;</span>
 <th>描述</th>
 </tr>
 </thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>xTimer</td>
 <td>需要更新的软件定时器的句柄。句柄将从用于创建软件计时器的 <code>xTimerCreate()</code> 调用中返回。</td>
 </tr>
@@ -912,7 +933,9 @@ uint32_t ulExecutionCount<span class="token punctuation">;</span>
 <td>返回值</td>
 <td>有两个可能的返回值 <br>1. <code>pdPASS</code> <br>只有当数据成功发送到定时器命令队列时，才会返回 <code>pdPASS</code>。<br>如果指定了阻塞时间( <code>xTicksToWait</code> 不为零)，则在函数返回之前，调用任务可能被置于阻塞状态，以等待定时器命令队列中的空间变为可用，但在阻塞时间到期之前，数据已成功写入定时器命令队列。<br><code>2. pdFALSE</code> <br>如果由于队列已满而无法将 <code>"reset"</code> 命令写入计时器命令队列，则将返回 <code>pdFALSE</code>。<br>如果指定了阻塞时间 ( <code>xTicksToWait</code> 不是零)，则调用任务将被置于阻塞状态，以等待守护进程任务在队列中腾出空间，但指定的阻塞时间在此之前已到期。</td>
 </tr>
-</tbody></table>
+</tbody>
+</table>
+</div>
 <h3 id="示例-15-重置软件定时器"><a href="#示例-15-重置软件定时器" class="headerlink" title="示例 15. 重置软件定时器"></a>示例 15. 重置软件定时器</h3><p>此示例模拟手机上的背光行为。背光：</p>
 <ul>
 <li>按下某个按键时打开。</li>
@@ -927,63 +950,63 @@ uint32_t ulExecutionCount<span class="token punctuation">;</span>
 </ul>
 <p><code>xSimulatedBacklightOn</code> 变量保存背光状态。<code>xSimulatedBacklightOn</code> 设置为pdTRUE表示背光打开，设置为 <code>pdFALSE</code> 表示背光关闭。</p>
 <p>软件定时器回调函数如清单85所示。</p>
-<pre class=" language-c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">prvBacklightTimerCallback</span><span class="token punctuation">(</span> TimerHandle_t xTimer <span class="token punctuation">)</span>
-<span class="token punctuation">{</span> 
-    TickType_t xTimeNow <span class="token operator">=</span> <span class="token function">xTaskGetTickCount</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<pre class=" language-lang-c"><code class="language-lang-c">static void prvBacklightTimerCallback( TimerHandle_t xTimer )
+{ 
+    TickType_t xTimeNow = xTaskGetTickCount();
 
-         <span class="token comment" spellcheck="true">/* 背光定时器超时，关闭背光。*/</span>
-        xSimulatedBacklightOn <span class="token operator">=</span> pdFALSE<span class="token punctuation">;</span>
+         /* 背光定时器超时，关闭背光。*/
+        xSimulatedBacklightOn = pdFALSE;
 
-         <span class="token comment" spellcheck="true">/*打印背光关闭的时间。*/</span>
-         <span class="token function">vPrintStringAndNumber</span><span class="token punctuation">(</span> <span class="token string">"Timer expired, turning backlight OFF at time\t\t"</span><span class="token punctuation">,</span> xTimeNow<span class="token punctuation">)</span><span class="token punctuation">;</span> 
-<span class="token punctuation">}</span>
+         /*打印背光关闭的时间。*/
+         vPrintStringAndNumber( "Timer expired, turning backlight OFF at time\t\t", xTimeNow); 
+}
 </code></pre>
 <p>清单 85. 示例 15 中使用的一次性定时器的回调函数</p>
 <p>示例 15 创建一个任务来轮询键盘[1]。清单 86 显示了该任务，但是由于下一段中描述的原因，清单 86 并不是最佳设计的代表。</p>
 <p><em>[1].打印到 Windows 控制台和从 Windows 控制台读取按键都会导致执行 Windows 系统调用。Windows 系统调用 ( 包括使用 Windows 控制台、磁盘或 TCP/IP 堆栈 )，可能会对 FreeRTOS Windows 移植的行为产生不利影响，因此通常应避免使用。</em></p>
 <p>使用FreeRTOS允许您的应用程序是事件驱动的。事件驱动设计非常有效地使用处理时间，因为处理时间仅在事件已发生时使用，并且处理时间不会浪费在轮询尚未发生的事件上。示例 15 不能由事件驱动，因为在使用 FreeRTOS Windows 移植时处理键盘中断是不切实际的，因此必须使用效率低得多的轮询技术。如果清单 86 是一个中断服务例程，那么将使用 <code>xTimerResetFromISR()</code> 代替 <code>xTimerReset()</code>。</p>
-<pre class=" language-c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">vKeyHitTask</span><span class="token punctuation">(</span> <span class="token keyword">void</span> <span class="token operator">*</span>pvParameters <span class="token punctuation">)</span> 
-<span class="token punctuation">{</span> 
-<span class="token keyword">const</span> TickType_t xShortDelay <span class="token operator">=</span> <span class="token function">pdMS_TO_TICKS</span><span class="token punctuation">(</span> <span class="token number">50</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
-TickType_t xTimeNow<span class="token punctuation">;</span>
+<pre class=" language-lang-c"><code class="language-lang-c">static void vKeyHitTask( void *pvParameters ) 
+{ 
+const TickType_t xShortDelay = pdMS_TO_TICKS( 50 );
+TickType_t xTimeNow;
 
-    <span class="token function">vPrintString</span><span class="token punctuation">(</span> <span class="token string">"Press a key to turn the backlight on.\r\n"</span> <span class="token punctuation">)</span><span class="token punctuation">;</span> 
+    vPrintString( "Press a key to turn the backlight on.\r\n" ); 
 
-    <span class="token comment" spellcheck="true">/* 理想情况下，应用程序应该是事件驱动的，并使用中断来处理按键。
+    /* 理想情况下，应用程序应该是事件驱动的，并使用中断来处理按键。
     在使用 FreeRTOS Windows 移植时使用键盘中断是不切实际的，
-    因此此任务用于轮询按键。*/</span>
-    <span class="token keyword">for</span><span class="token punctuation">(</span> <span class="token punctuation">;</span><span class="token punctuation">;</span> <span class="token punctuation">)</span>
-    <span class="token punctuation">{</span>
-        <span class="token comment" spellcheck="true">/* 按键被按下了吗?*/</span> 
-        <span class="token keyword">if</span><span class="token punctuation">(</span> <span class="token function">_kbhit</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token number">0</span> <span class="token punctuation">)</span> 
-        <span class="token punctuation">{</span>
-            <span class="token comment" spellcheck="true">/* 已按下一个按键。记录时间。 */</span> 
-            xTimeNow <span class="token operator">=</span> <span class="token function">xTaskGetTickCount</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    因此此任务用于轮询按键。*/
+    for( ;; )
+    {
+        /* 按键被按下了吗?*/ 
+        if( _kbhit() != 0 ) 
+        {
+            /* 已按下一个按键。记录时间。 */ 
+            xTimeNow = xTaskGetTickCount();
 
-            <span class="token keyword">if</span><span class="token punctuation">(</span> xSimulatedBacklightOn <span class="token operator">==</span> pdFALSE <span class="token punctuation">)</span>
-            <span class="token punctuation">{</span>
-                <span class="token comment" spellcheck="true">/* 背光已关闭，因此将其打开并打印其打开的时间。 */</span> 
-                xSimulatedBacklightOn <span class="token operator">=</span> pdTRUE<span class="token punctuation">;</span> <span class="token function">vPrintStringAndNumber</span><span class="token punctuation">(</span>
-                                            <span class="token string">"Key pressed, turning backlight ON at time\t\t"</span><span class="token punctuation">,</span> xTimeNow <span class="token punctuation">)</span><span class="token punctuation">;</span>
-            <span class="token punctuation">}</span>
-            <span class="token keyword">else</span>
-            <span class="token punctuation">{</span> 
-                <span class="token comment" spellcheck="true">/* 背光已打开，因此打印一条消息，说明定时器即将重置以及重置的时间。*/</span>
-                <span class="token function">vPrintStringAndNumber</span><span class="token punctuation">(</span>
-                                    <span class="token string">"Key pressed, resetting software timer at time\t\t"</span><span class="token punctuation">,</span> xTimeNow <span class="token punctuation">)</span><span class="token punctuation">;</span> 
-             <span class="token punctuation">}</span> 
+            if( xSimulatedBacklightOn == pdFALSE )
+            {
+                /* 背光已关闭，因此将其打开并打印其打开的时间。 */ 
+                xSimulatedBacklightOn = pdTRUE; vPrintStringAndNumber(
+                                            "Key pressed, turning backlight ON at time\t\t", xTimeNow );
+            }
+            else
+            { 
+                /* 背光已打开，因此打印一条消息，说明定时器即将重置以及重置的时间。*/
+                vPrintStringAndNumber(
+                                    "Key pressed, resetting software timer at time\t\t", xTimeNow ); 
+             } 
 
-             <span class="token comment" spellcheck="true">/* 重置软件定时器。如果之前关闭了背光，则此调用将启动定时器。
+             /* 重置软件定时器。如果之前关闭了背光，则此调用将启动定时器。
              如果背光先前处于打开状态，则此调用将重新启动定时器。
              真实的应用程序可以读取中断中的按键。如果此函数是中断服务例程，
-             则必须使用xTimerResetFromISR()而不是xTimerReset()。*/</span>
-             <span class="token function">xTimerReset</span><span class="token punctuation">(</span> xBacklightTimer<span class="token punctuation">,</span> xShortDelay <span class="token punctuation">)</span><span class="token punctuation">;</span> 
+             则必须使用xTimerResetFromISR()而不是xTimerReset()。*/
+             xTimerReset( xBacklightTimer, xShortDelay ); 
 
-             <span class="token comment" spellcheck="true">/* 读取并丢弃按下的按键 --- 这在这个简单的示例中不是必需的。*/</span> 
-             <span class="token punctuation">(</span> <span class="token keyword">void</span> <span class="token punctuation">)</span> <span class="token function">_getch</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-           <span class="token punctuation">}</span>
-      <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+             /* 读取并丢弃按下的按键 --- 这在这个简单的示例中不是必需的。*/ 
+             ( void ) _getch(); 
+           }
+      }
+}
 </code></pre>
 <p>清单 86. 示例15中用于重置软件定时器的任务</p>
 <p>执行示例 15 时产生的输出如图 47 所示。参考图 47 ：</p>
@@ -992,7 +1015,7 @@ TickType_t xTimeNow<span class="token punctuation">;</span>
 <li>当滴答计数为 1813、3114、4015 和 5016 时，发生了进一步的按键。所有这些按键都会导致定时器在到期之前被重置。</li>
 <li>定时器在滴答计数为 10016 时到期。此时，关闭背光。</li>
 </ul>
-<p><img src="/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/image-20240401055137191.png" alt="图 47 执行示例 15 时产生的输出"></p>
+<p><img src="image-20240401055137191.png" alt="图 47 执行示例 15 时产生的输出"></p>
 <p>在图 47 中可以看到，定时器有 5000 个滴答的周期；最后一次按下按键后，背光恰好在 5000 次滴答后关闭，所以在最后一次重置定时器之后有 5000 个滴答。</p>
 
                 
