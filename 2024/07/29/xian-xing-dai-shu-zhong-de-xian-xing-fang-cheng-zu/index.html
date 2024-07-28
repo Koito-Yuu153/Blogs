@@ -4,8 +4,10 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="Koito Yuu&#39;s Blogs">
-    <meta name="description" content="Koito Yuu&#39;s Blogs">
+    <meta name="keywords" content="线性代数中的线性方程组, Koito Yuu&#39;s Blogs">
+    <meta name="description" content="1.1 线性方程组包含变量  $x,x{1},x{2},…,x_{n}$ 的线性方程是形如 : 
+
+a_{1}x_{1} + a_{2}x_{2} + ... + a_{n}x_{n} = b的方程，其中 $b$ 与系数 $a, a{2} ">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -17,7 +19,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Koito Yuu&#39;s Blogs</title>
+    <title>线性代数中的线性方程组 | Koito Yuu&#39;s Blogs</title>
     <link rel="icon" type="image/png" href="/Blogs/favicon.png">
     
     <style>
@@ -31,48 +33,7 @@
 
 
 
-    <!-- index cover -->
-    <!-- <link rel="stylesheet preload" type="text/css" href="/Blogs/css/indexcover.css"> -->
-    <style>
-        .carousel-control {
-            width: 45px;
-            height: 45px;
-            line-height: 55px;
-            border-radius: 45px;
-            background: transparent;
-            cursor: pointer;
-            z-index: 100;
-        }
-        
-        #prev-cover {
-            position: absolute;
-            top: 48%;
-            left: 8px;
-        }
-        
-        #next-cover {
-            position: absolute;
-            top: 48%;
-            right: 8px;;
-        }
-        
-        #prev-cover i {
-            margin-right: 3px;
-        }
-        
-        #next-cover i {
-            margin-left: 3px;
-        }
-        
-        .carousel-control:hover {
-            background-color: rgba(0, 0, 0, .4);
-        }
-        
-        .carousel-control i {
-            color: #fff;
-            font-size: 2.4rem;
-        }
-    </style>
+    <!-- bg-cover style     -->
 
 
 
@@ -93,6 +54,10 @@
 
 
 
+
+    
+        <link rel="stylesheet" type="text/css" href="/Blogs/css/reward.css">
+    
 
 
 
@@ -381,559 +346,521 @@
     
 
 
-<div class="carousel carousel-slider center index-cover" data-indicators="true" style="margin-top: -64px;">
-    
 
-    <div class="carousel-item  white-text bg-cover about-cover">
-        <div class="container">
-            <div class="row">
-    <div class="col s10 offset-s1 m8 offset-m2 l8 offset-l2">
-        <div class="brand">
-            <div class="title center-align">
-                
-                Koito Yuu
-                
-            </div>
-
-            <div class="description center-align">
-                
-                <span id="subtitle"></span>
-                <script src="/Blogs/libs/typed/typed.js"></script>
-                <script>
-                    var typed = new Typed("#subtitle", {
-                        strings: [ 
-                            
-                                "从来没有真正的绝境, 只有心灵的迷途",
-                            
-                                "Never really desperate, only the lost of the soul",
-                            
-                        ],
-                        startDelay: 300,
-                        typeSpeed: 100,
-                        loop: true,
-                        backSpeed: 50,
-                        showCursor: true
-                    });
-                </script>
-                
+<div class="bg-cover pd-header post-cover" style="background-image: url('/Blogs/medias/featureimages/18.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">线性代数中的线性方程组</h1>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 
-<script>
-    $('.bg-cover').css('background-image', 'url(/Blogs/medias/banner/0.jpg)');
-</script>
 
 
-
-            <div class="cover-btns">
-                <a href="#indexCard" class="waves-effect waves-light btn">
-                    <i class="fa fa-angle-double-down"></i>开始阅读
-                </a>
-
-                
-                    <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light btn" target="_blank">
-                        <i class="fab fa-github-alt"></i>Github
-                    </a>
-                
-            </div>
-            <div class="cover-social-link">
-    <a href="https://github.com/Koito-Yuu153" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
-        <i class="fab fa-github"></i>
-    </a>
-
-
-
-    <a href="mailto:1181062873@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
-        <i class="fas fa-envelope-open"></i>
-    </a>
-
-
-
-
-
-
-
-    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=2810880357" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 2810880357" data-position="top" data-delay="50">
-        <i class="fab fa-qq"></i>
-    </a>
-
-
-
-
-
-
-
-</div>
-        </div>
-    </div>
+<main class="post-container content">
 
     
+    <div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                          <div class="article-tag">
+                            <span class="chip bg-color">无标签</span>
+                          </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/Blogs/categories/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0/" class="post-category">
+                                线性代数
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2024-07-29
+                </div>
+                
+
+                
+
+                
+
+                
+
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h2 id="1-1-线性方程组"><a href="#1-1-线性方程组" class="headerlink" title="1.1 线性方程组"></a>1.1 线性方程组</h2><p>包含变量  $x,x<em>{1},x</em>{2},…,x_{n}$ 的<strong>线性方程</strong>是形如 : </p>
+<script type="math/tex; mode=display">
+a_{1}x_{1} + a_{2}x_{2} + ... + a_{n}x_{n} = b</script><p>的方程，其中 $b$ 与<strong>系数</strong> $a, a<em>{2} , … , a</em>{n}$ 是实数或复数，通常是已知数。下标 $n$ 可以是任意正整数。在本书的例题中，$n$ 通常在 2 与 5 之间。在实际问题中，$n$ 可以是 50、5000 或更大。</p>
+<p><strong>线性方程组</strong>是由一个或几个包含相同变量  $x , x<em>{1} , x</em>{2} , … , x_{n}$ 的线性方程组成的.例如，</p>
+<script type="math/tex; mode=display">
+2x_{1} + x_{2} + 1.5x_{3} = 8
+\\
+x_{1} - 4x_{3} = -7</script><p>线性方程组的解是一组数 ( $s,s<em>{2},…,s</em>{n}$ )， 用这组数分别代替 $x,x<em>{1},x</em>{2},…,x<em>{n}$ 时所有方程的两边相等。例如，上述方程组有一组解(5, 6.5, 3)，这是因为，用这些值代替 $x,x</em>{1},x<em>{2},…,x</em>{n}$ 时，方程组变成等式 8 = 8 和 -7 = -7 。</p>
+<p>方程组所有可能的解的集合称为线性方程组的<strong>解集</strong>。若两个线性方程组有相同的解集，则这两个线性方程组称为<strong>等价的</strong>。也就是说，第一个方程组的每个解都是第二个方程组的解，第二个方程组的每个解都是第一个方程组的解。</p>
+<p>求包含两个变量的两个线性方程组成的方程组的解，等价于求两条直线的交点。</p>
+<p><img src="image-20240728231003945.png" style="zoom:50%;"></p>
+<p>线性方程组的解有下列三种情况：以</p>
+<ol>
+<li>无解.</li>
+<li>有唯一解.</li>
+<li>有无穷多解.</li>
+</ol>
+<p>若一个线性方程组有一个解或无穷多个解，我们称它是<strong>相容的</strong>；若它无解，则称它是<strong>不相容的</strong>。</p>
+<p><strong>矩阵记号</strong></p>
+<p>一个线性方程组包含的主要信息可以用一个称为矩阵的紧凑的矩形阵列表示。给出方程组</p>
+<script type="math/tex; mode=display">
+x - 2x_{2}+x_{3} = 0
+\\
+2x_{2} - 8x_{3} = 8
+\\
+5x_{1} - 5x_{3} = 10</script><p>把每一个变量的系数写在对齐的一列中，矩阵</p>
+<script type="math/tex; mode=display">
+\left[\begin{array}{rrr}
+1 & -2 & 1 \\
+0 & 2 & -8 \\
+5 & 0 & -5
+\end{array}\right]</script><p>称为上述方程的 <strong>系数矩阵</strong> 。而</p>
+<script type="math/tex; mode=display">
+\left[\begin{array}{rrr}
+1 & -2 & 1 & 0 \\
+0 & 2 & -8 & 8 \\
+5 & 0 & -5 & 10
+\end{array}\right]</script><p>称为它的 <strong>增广矩阵</strong> 。</p>
+<p>矩阵的<strong>维数</strong>说明它包含的行数和列数。上面的增广矩阵有3行4列，称为3×4（ 读作 3 行 4 列 ) 矩阵.若 $m,n$ 是正整数，$m×n$ 矩阵是一个有 $m$ 行 $n$ 列的数的矩形阵列。( 行数写在前<br>面 ) 矩阵记号为解方程组带来方便</p>
+<p>线性方程的变换对应于增广矩阵的行变换。</p>
+<p><strong>初等行变换</strong></p>
+<ol>
+<li>( 倍加变换 ) 把某一行换成它本身与另一行的倍数的和.</li>
+<li>( 对换变换 ) 把两行对换.</li>
+<li>( 倍乘变换 ) 把某一行的所有元素乘以同一个非零数.</li>
+</ol>
+<p>行变换可施行于任何矩阵，不仅仅是对于线性方程组的增广矩阵。若两个矩阵中的一个矩阵可以经一系列初等行变换成为另一个矩阵，则我们称两个矩阵为<strong>行等价的</strong> 。</p>
+<p>重要的一点是行变换是<strong>可逆的</strong>。若两行被对换，则再次对换它们就会还原为原来的状态，若某行乘以非零常数c,则将所得的行乘以1/c就得出原来的行，最后，考虑涉及两行的倍加变换，例如第一行和第二行。假设把第一行的 $c$ 倍加到第二行得到新的第二行，那么“逆”变换就是把第一行的 $-c$ 倍加到（新的）第二行上就得到原来的第二行。</p>
+<p>若两个线性方程组的增广矩阵是行等价的，则它们具有<strong>相同的解集</strong>。</p>
+<p><strong>线性方程组的两个基本问题</strong></p>
+<ol>
+<li>方程组是否相容，即它是否至少有一个解？</li>
+<li>若它有解，它是否只有一个解，即解是否唯一？</li>
+</ol>
+<h2 id="1-2-行化简与阶梯形矩阵"><a href="#1-2-行化简与阶梯形矩阵" class="headerlink" title="1.2 行化简与阶梯形矩阵"></a>1.2 行化简与阶梯形矩阵</h2><p>定义中，矩阵中非零行或列指矩阵中至少包含一个非零元素的行或列；非零行的 <strong>先导元素</strong> 是指该行中最左边的非零元素。</p>
+<p>定义一个矩阵称为阶梯形（或行阶梯形），若它有以下三个性质：</p>
+<ol>
+<li>每一非零行都在每一零行之上</li>
+<li>某一行的先导元素所在的列位于前一行先导元素的右边.</li>
+<li>某一先导元素所在列下方元素都是零</li>
+</ol>
+<p>若一个阶梯形矩阵还满足以下性质，则称它为简化阶梯形（或简化行阶梯形)</p>
+<ol>
+<li>每一非零行的先导元素是 1</li>
+<li>每一先导元素1是该元素所在列的唯一非零元素</li>
+</ol>
+<p>若一个矩阵具有阶梯形（简化阶梯形），就称它为<strong>阶梯形（简化阶梯形）</strong>矩阵.性质 2 说明先导元素构成阶梯形.性质 3 其实是性质 2 的推论，不过我们把它列出来以示强调。</p>
+<script type="math/tex; mode=display">
+\left[\begin{array}{rrr}
+2 & -3 & 2 & 1 \\
+0 & 1 & -4 & 8 \\
+0 & 0 & 0 & 5/2
+\end{array}\right]
+和
+\left[\begin{array}{rrr}
+1 & 0 & 0 & 29 \\
+0 & 1 & 0 & 16 \\
+0 & 0 & 1 & 3
+\end{array}\right]</script><p>上面两个矩阵都是阶梯型的，第二个矩阵是简化阶梯形的。</p>
+<p>任何非零矩阵都可以<strong>行化简</strong>（即用初等行变换）变为阶梯形矩阵，但用不同的方法可化为不同的阶梯形矩阵。然而，<strong>一个矩阵只能化为唯一的简化阶梯形矩阵。</strong></p>
+<p><strong>定理1</strong>（简化阶梯形矩阵的唯一性）<br><strong>每个矩阵行等价于唯一的简化阶梯形矩阵。</strong></p>
+<p>若矩阵 $A$ 行等价于阶梯形矩阵 $U$ ,则称 $U$ 为 $A$ 的阶梯形（或行阶梯形）：若 $U$ 是简化阶梯形，则称 $U$ 为 $A$ 的简化阶梯形。大部分矩阵程序用 $RREF$ 作为简化（行）阶梯形的缩写，有些用 $REF$ 作为（行）阶梯形的缩写。</p>
+<p><strong>主元位置</strong></p>
+<p><strong>定义</strong> : 矩阵中的 <strong>主元位置</strong> 是 $A$ 中对应于它的阶梯形中先导元素 1 的位置。<strong>主元列</strong> 是 $A$ 的含有主元位置的列。<strong>主元</strong> 就是在主元位置上的非零元素。</p>
+<h2 id="1-3-向量方程"><a href="#1-3-向量方程" class="headerlink" title="1.3 向量方程"></a>1.3 向量方程</h2><p>线性方程组的重要性质都可用向量概念与符号来描述，本节把通常的方程组与向量方程联系起来。名词向量出现在各种数学和物理教科书中，之后我们将讨论“向量空间”，在此之前，我们用<strong>向量表示一组有序数</strong>。这种简单的思想使得我们能够尽快地将它们应用于有趣和重要的问题。</p>
+<p>仅含一列的矩阵称为<strong>列向量</strong>，或简称<strong>向量</strong>。包含两个元素的向量如下所示。</p>
+<script type="math/tex; mode=display">
+u = \left[\begin{array}{rrr}
+3  \\
+-1 
+\end{array}\right]
+,
+v = \left[\begin{array}{rrr}
+0.2  \\
+0.3 
+\end{array}\right]
+,
+w = \left[\begin{array}{rrr}
+w_{1}  \\
+w_{2} 
+\end{array}\right]</script><p>其中 $w<em>{1}$ 和 $w</em>{2}$ 是任意实数.所有两个元素的向量的集记为 $\mathbb{R}^{2}$，$\mathbb{R}$ 表示向量中的元素是实数，而指数 2 表示每个向量包含两个元素。</p>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/Blogs/about" rel="external nofollow noreferrer">Koito Yuu</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://koito-yuu153.github.io/Blogs/Blogs/2024/07/29/xian-xing-dai-shu-zhong-de-xian-xing-fang-cheng-zu/">https://koito-yuu153.github.io/Blogs/Blogs/2024/07/29/xian-xing-dai-shu-zhong-de-xian-xing-fang-cheng-zu/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/Blogs/about" target="_blank">Koito Yuu</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            <span class="chip bg-color">无标签</span>
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/Blogs/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/Blogs/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/Blogs/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/Blogs/medias/reward/wechat.jpg" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
     $(function () {
-        let coverSlider = $('.carousel');
+        $('.tabs').tabs();
+    });
+</script>
 
-        //用户触摸轮播自动 restartPlay 是否生效
-        let initUserPressedOrDraggedActive = false
-
-        //用户触摸轮播自动 restartPlay
-        function initUserPressedOrDragged(instance) {
-            setInterval(() => {
-                if (instance.pressed || instance.dragged) {
-                    // console.log('initUserPressedOrDragged: ',instance.pressed,instance.dragged)
-                    restartPlay()
-                }
-            }, 1000)
-        }
-
-        coverSlider.carousel({
-            duration: Number('120'),
-            fullWidth: true,
-            indicators: 'true' === 'true',
-            onCycleTo() {
-                if (!initUserPressedOrDraggedActive) {
-                    // console.log('initUserPressedOrDraggedActive')
-                    initUserPressedOrDragged(this)
-                    initUserPressedOrDraggedActive = true
-                }
-            },
-        })
-
-        let carouselIntervalId;
-        
-        // Loop to call the next cover article picture.
-        let autoCarousel = function () {
-            carouselIntervalId = setInterval(function () {
-                coverSlider.carousel('next');
-            }, 5000);
-        };
-        autoCarousel();
-        
-
-        function restartPlay() {
             
-            clearInterval(carouselIntervalId);
-            autoCarousel();
-            
-        };
+        </div>
+    </div>
 
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
         
-        // prev and next cover post.
-        $('#prev-cover').click(function () {
-            coverSlider.carousel('prev');
-            restartPlay();
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
+            <div class="card">
+                <a href="/Blogs/2024/07/29/xian-xing-dai-shu-zhong-de-xian-xing-fang-cheng-zu/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/Blogs/medias/featureimages/18.jpg" class="responsive-img" alt="线性代数中的线性方程组">
+                        
+                        <span class="card-title">线性代数中的线性方程组</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-07-29
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/Blogs/categories/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0/" class="post-category">
+                                    线性代数
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/Blogs/2024/07/29/chapter-4-dui-lie-guan-li/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/Blogs/medias/featureimages/12.jpg" class="responsive-img" alt="Chapter 4 队列管理">
+                        
+                        <span class="card-title">Chapter 4 队列管理</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-07-29
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/Blogs/categories/FreeRTOS/" class="post-category">
+                                    FreeRTOS
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/Blogs/libs/codeBlock/codeBlockFuction.js"></script>
+
+
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/Blogs/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/Blogs/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/Blogs/libs/codeBlock/codeShrink.js"></script>
+
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/Blogs/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
         });
-        $('#next-cover').click(function () {
-            coverSlider.carousel('next');
-            restartPlay();
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
         });
         
     });
 </script>
 
-
-
-<main class="content">
-
     
-    <div id="indexCard" class="index-card">
-        <div class="container ">
-            <div class="card">
-                <div class="card-content">
-                    
-                        <div class="dream">
-    
-    <div class="title center-align">
-        <i class="far fa-lightbulb"></i>&nbsp;&nbsp;日常
-    </div>
-    
-    <div class="row">
-        <div class="col l8 offset-l2 m10 offset-m1 s10 offset-s1 center-align text">
-            我们所度过的每个平凡的日常，也许就是连续发生的奇迹。
-        </div>
-    </div>
-</div>
-
-                    
-
-                    
-
-                    
-
-                    
-                    <div id="recommend-sections" class="recommend">
-                        
-
-
-
-                    </div>
-                    
-                </div>
-            </div>
-        </div>
-    </div>
-    
-
-    
-
-    <!-- 所有文章卡片 -->
-    <article id="articles" class="container articles">
-        <div class="row article-row">
-            
-             <!-- 隐藏某个文章 -->
-            <div class="article col s12 m6 l4" data-aos="zoom-in">
-                <div class="card">
-                    <a href="/Blogs/2024/07/29/xian-xing-dai-shu-zhong-de-xian-xing-fang-cheng-zu/">
-                        <div class="card-image">
-                            
-                            
-                            <img src="/Blogs/medias/featureimages/18.jpg" class="responsive-img" alt="线性代数中的线性方程组">
-                            
-                            <span class="card-title">线性代数中的线性方程组</span>
-                        </div>
-                    </a>
-
-                    <div class="card-content article-content">
-                        <div class="summary block-with-text">
-                            
-                                1.1 线性方程组包含变量  $x,x{1},x{2},…,x_{n}$ 的线性方程是形如 : 
-
-a_{1}x_{1} + a_{2}x_{2} + ... + a_{n}x_{n} = b的方程，其中 $b$ 与系数 $a, a{2} 
-                            
-                        </div>
-                        <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2024-07-29
-                            </span>
-                            <span class="publish-author">
-                                
-                                <i class="fas fa-bookmark fa-fw icon-category"></i>
-                                
-                                <a href="/Blogs/categories/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0/" class="post-category">
-                                    线性代数
-                                </a>
-                                
-                                
-                            </span>
-                        </div>
-                    </div>
-
-                    
-                </div>
-            </div>
-              <!-- 隐藏某个文章 -->
-            
-             <!-- 隐藏某个文章 -->
-            <div class="article col s12 m6 l4" data-aos="zoom-in">
-                <div class="card">
-                    <a href="/Blogs/2024/07/29/chapter-4-dui-lie-guan-li/">
-                        <div class="card-image">
-                            
-                            
-                            <img src="/Blogs/medias/featureimages/12.jpg" class="responsive-img" alt="Chapter 4 队列管理">
-                            
-                            <span class="card-title">Chapter 4 队列管理</span>
-                        </div>
-                    </a>
-
-                    <div class="card-content article-content">
-                        <div class="summary block-with-text">
-                            
-                                队列管理4.1 章节介绍与范围" 队列 ( Queues ) " 提供了一个任务到任务，任务到中断和中断到任务的通讯机制。
-范围本章节的目标是告诉读者很好的理解：
-
-如何创建一个队列。
-队列如何管理它所包含的数据。
-如何发送数据到队列。
-如
-                            
-                        </div>
-                        <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2024-07-29
-                            </span>
-                            <span class="publish-author">
-                                
-                                <i class="fas fa-bookmark fa-fw icon-category"></i>
-                                
-                                <a href="/Blogs/categories/FreeRTOS/" class="post-category">
-                                    FreeRTOS
-                                </a>
-                                
-                                
-                            </span>
-                        </div>
-                    </div>
-
-                    
-                </div>
-            </div>
-              <!-- 隐藏某个文章 -->
-            
-             <!-- 隐藏某个文章 -->
-            <div class="article col s12 m6 l4" data-aos="zoom-in">
-                <div class="card">
-                    <a href="/Blogs/2024/06/15/chapter-6-zhong-duan-guan-li/">
-                        <div class="card-image">
-                            
-                            
-                            <img src="/Blogs/medias/featureimages/22.jpg" class="responsive-img" alt="Chapter 6 中断管理">
-                            
-                            <span class="card-title">Chapter 6 中断管理</span>
-                        </div>
-                    </a>
-
-                    <div class="card-content article-content">
-                        <div class="summary block-with-text">
-                            
-                                Chapter 6 中断管理章节介绍和范围事件嵌入式实时系统必须对源自环境的事件做出响应。例如，到达以太网外设的数据包（事件）可能需要传递到 TCP/IP 栈进行处理（操作）。非平凡的系统必须服务于来自多个源的事件，所有这些源都有不同的处理
-                            
-                        </div>
-                        <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2024-06-15
-                            </span>
-                            <span class="publish-author">
-                                
-                                <i class="fas fa-bookmark fa-fw icon-category"></i>
-                                
-                                <a href="/Blogs/categories/FreeRTOS/" class="post-category">
-                                    FreeRTOS
-                                </a>
-                                
-                                
-                            </span>
-                        </div>
-                    </div>
-
-                    
-                </div>
-            </div>
-              <!-- 隐藏某个文章 -->
-            
-             <!-- 隐藏某个文章 -->
-            <div class="article col s12 m6 l4" data-aos="zoom-in">
-                <div class="card">
-                    <a href="/Blogs/2024/06/15/chapter-5-ruan-jian-ding-shi-qi-guan-li/">
-                        <div class="card-image">
-                            
-                            
-                            <img src="/Blogs/medias/featureimages/12.jpg" class="responsive-img" alt="Chapter 5 软件定时器管理">
-                            
-                            <span class="card-title">Chapter 5 软件定时器管理</span>
-                        </div>
-                    </a>
-
-                    <div class="card-content article-content">
-                        <div class="summary block-with-text">
-                            
-                                Chapter 5 软件定时器管理章节介绍和范围软件定时器用于安排函数在设定的未来时间点执行，或者以固定频率定期执行。 软件定时器执行的函数称为软件定时器的回调函数。
-软件定时器由 FreeRTOS 内核实现，并受 FreeRTOS内核 的
-                            
-                        </div>
-                        <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2024-06-15
-                            </span>
-                            <span class="publish-author">
-                                
-                                <i class="fas fa-bookmark fa-fw icon-category"></i>
-                                
-                                <a href="/Blogs/categories/FreeRTOS/" class="post-category">
-                                    FreeRTOS
-                                </a>
-                                
-                                
-                            </span>
-                        </div>
-                    </div>
-
-                    
-                </div>
-            </div>
-              <!-- 隐藏某个文章 -->
-            
-             <!-- 隐藏某个文章 -->
-            <div class="article col s12 m6 l4" data-aos="zoom-in">
-                <div class="card">
-                    <a href="/Blogs/2024/06/15/chapter-3-ren-wu-guan-li/">
-                        <div class="card-image">
-                            
-                            
-                            <img src="/Blogs/medias/featureimages/21.jpg" class="responsive-img" alt="Chapter 3 任务管理">
-                            
-                            <span class="card-title">Chapter 3 任务管理</span>
-                        </div>
-                    </a>
-
-                    <div class="card-content article-content">
-                        <div class="summary block-with-text">
-                            
-                                Chapter 3 任务管理3.1 章节介绍和范围范围本章旨在让读者更好地理解 : 
-
-FreeRTOS 如何为应用程序中的每个任务分配处理时间。
-FreeRTOS 如何选择在任何给定时间应该执行哪个任务。
-每个任务的相对优先级如何影响系统
-                            
-                        </div>
-                        <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2024-06-15
-                            </span>
-                            <span class="publish-author">
-                                
-                                <i class="fas fa-bookmark fa-fw icon-category"></i>
-                                
-                                <a href="/Blogs/categories/FreeRTOS/" class="post-category">
-                                    FreeRTOS
-                                </a>
-                                
-                                
-                            </span>
-                        </div>
-                    </div>
-
-                    
-                </div>
-            </div>
-              <!-- 隐藏某个文章 -->
-            
-             <!-- 隐藏某个文章 -->
-            <div class="article col s12 m6 l4" data-aos="zoom-in">
-                <div class="card">
-                    <a href="/Blogs/2024/03/21/hexo-de-shi-yong-jiao-cheng/">
-                        <div class="card-image">
-                            
-                            
-                            <img src="/Blogs/medias/featureimages/3.jpg" class="responsive-img" alt="hexo的使用教程">
-                            
-                            <span class="card-title">hexo的使用教程</span>
-                        </div>
-                    </a>
-
-                    <div class="card-content article-content">
-                        <div class="summary block-with-text">
-                            
-                                声明本文的内容适用性可能会随着 hexo 和相关程序的更新而改变，请以实际的操作结果为准。
-什么是 Hexo？Hexo 是一个快速、简洁且高效的博客框架。Hexo 使用 Markdown（或其他标记语言）解析文章，在几秒内，即可利用靓丽的主
-                            
-                        </div>
-                        <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2024-03-21
-                            </span>
-                            <span class="publish-author">
-                                
-                                <i class="fas fa-user fa-fw"></i>
-                                Koito Yuu
-                                
-                            </span>
-                        </div>
-                    </div>
-
-                    
-                </div>
-            </div>
-              <!-- 隐藏某个文章 -->
-            
-             <!-- 隐藏某个文章 -->
-            <div class="article col s12 m6 l4" data-aos="zoom-in">
-                <div class="card">
-                    <a href="/Blogs/2023/03/07/dram-ji-chu-gai-nian/">
-                        <div class="card-image">
-                            
-                            
-                            <img src="/Blogs/medias/featureimages/11.jpg" class="responsive-img" alt="DRAM基础概念">
-                            
-                            <span class="card-title">DRAM基础概念</span>
-                        </div>
-                    </a>
-
-                    <div class="card-content article-content">
-                        <div class="summary block-with-text">
-                            
-                                简介DRAM (Dynamic Random Access Memory, 动态随机访问内存 ) ，是现在主流的内存形式。基本单元主要由一个晶体管和一个电容组成，电容中有电荷代表 “ 1 “，没有电荷代表 “ 0 “ 。由于电容中的电荷会随
-                            
-                        </div>
-                        <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2023-03-07
-                            </span>
-                            <span class="publish-author">
-                                
-                                <i class="fas fa-bookmark fa-fw icon-category"></i>
-                                
-                                <a href="/Blogs/categories/DRAM-%E5%AD%98%E5%82%A8%E5%99%A8/" class="post-category">
-                                    DRAM 存储器
-                                </a>
-                                
-                                
-                            </span>
-                        </div>
-                    </div>
-
-                    
-                </div>
-            </div>
-              <!-- 隐藏某个文章 -->
-            
-             <!-- 隐藏某个文章 -->
-            <div class="article col s12 m6 l4" data-aos="zoom-in">
-                <div class="card">
-                    <a href="/Blogs/2023/03/07/shen-du-xue-xi/">
-                        <div class="card-image">
-                            
-                            
-                            <img src="/Blogs/medias/featureimages/21.jpg" class="responsive-img" alt="深度学习笔记">
-                            
-                            <span class="card-title">深度学习笔记</span>
-                        </div>
-                    </a>
-
-                    <div class="card-content article-content">
-                        <div class="summary block-with-text">
-                            
-                                    在机器学习中，一切的数据都可以看作是矩阵
-
-Tensor：可以进行GPU加速计算的矩阵（任意维度），Tensorflow操作的基本呢单元
-Tensor可以和numpy进行相互转换
-#直接转换
-x.numpy()
-#指定转换格式
-x=
-                            
-                        </div>
-                        <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2023-03-07
-                            </span>
-                            <span class="publish-author">
-                                
-                                <i class="fas fa-bookmark fa-fw icon-category"></i>
-                                
-                                <a href="/Blogs/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" class="post-category">
-                                    深度学习
-                                </a>
-                                
-                                
-                            </span>
-                        </div>
-                    </div>
-
-                    
-                </div>
-            </div>
-              <!-- 隐藏某个文章 -->
-            
-        </div>
-    </article>
 
 </main>
 
+
+<script src="https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script>
+    MathJax.Hub.Config({
+        tex2jax: {inlineMath: [['$', '$'], ['\\(', '\\)']]}
+    });
+</script>
 
 
 
